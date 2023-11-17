@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox as msg
 import sqlite3
 from sqlite3 import Error
 import datetime
@@ -12,7 +13,7 @@ today_string = "{0}/{1}/{2}".format(today.day,today.month,today.year)
 def challenge(p1,p2):
     # Έλεγχος αν υπάρχουν τα ονόματα στο ranking
     if empty_check(p2):
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message=f"Δεν υπάρχει παίκτης στη θέση #{p2}")
         return
     
@@ -21,24 +22,24 @@ def challenge(p1,p2):
     k5 = 4 if p1 > 9 else 3  # Αντί για   if player1 <= 9 ....
     if p1 - p2 > k5:
         
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message=f'''Ο παίκτης που προκαλείται βρίσκεται {k5} θέσεις πάνω από τον παίκτη που προκαλεί.
 Η πρόκληση είναι άκυρη.''')
         return
     
     
     elif p1 - p2 < 0:
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message="Ο παίκτης που προκαλείται είναι κάτω από τον παίκτη που προκαλεί. \nΗ πρόκληση είναι άκυρη.")
         return
     
     
     elif p1 == p2:
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message='Λάθος καταχώρηση.')
         return exit
     
-    answer = tk.messagebox.askyesnocancel(title='Αποτέλεσμα Αγώνα',message=f'''Η πρόκληση είναι αποδεκτή.
+    answer = msg.askyesnocancel(title='Αποτέλεσμα Αγώνα',message=f'''Η πρόκληση είναι αποδεκτή.
 Νίκησε ο παίκτης στη θέση #{p1} που έκανε την πρόκληση;''')
     
     if answer == True:
@@ -46,7 +47,7 @@ def challenge(p1,p2):
     if answer == False:
         win(p2,p1)
     if answer == None:
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message="Ο αγώνας δεν καταγράφηκε, ακύρωση από τον χρήστη.")
         return
 
@@ -92,7 +93,7 @@ def initialization(initializationPlayers,today_string=today_string):
    
     my_conn.commit()
     my_conn.close()
-    tk.messagebox.showinfo(master=w1, title='Ειδοποίηση', 
+    msg.showinfo(master=w1, title='Ειδοποίηση', 
                             message='Οι παίκτες καταχωρήθηκαν τυχαία στην κατάταξη.')
 
 
@@ -133,7 +134,7 @@ def insert_bottom(Name='', Surname='', Wins=0, Loses=0, Control_Date=today_strin
     newPlayer = (new_last_place, Name, Surname, Wins, Loses, today_string) #Πλειάδα στοιχείων παίκτη
     c.execute("INSERT INTO ranking VALUES {0};".format(newPlayer)) #Εκχώρηση παίκτη σε αυτή τη θέση
     
-    tk.messagebox.showinfo(master=w1,parent=nameEntryWindow, title='Ειδοποίηση', 
+    msg.showinfo(master=w1,parent=nameEntryWindow, title='Ειδοποίηση', 
                             message=f'Ο {Name} {Surname} τοποθετήθηκε επιτυχώς στη θέση #{new_last_place}.')
     
     my_conn.commit()
@@ -147,7 +148,7 @@ def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_
 
     if empty_check(Rank-1) and Rank != 1: #Αν προσπαθεί να βάλει τον παίκτη σε θέση πάνω από την οποία δεν 
     #υπάρχει άλλος παίκτης
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message=f"Δεν υπάρχει άλλος παίκτης πριν τη θέση που προσπαθείτε να καταχωρήσετε τον παίκτη {Name} {Surname}.")
 
     else:
@@ -169,7 +170,7 @@ def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_
         
         #Εισαγωγή στην κατάταξη είτε η λίστα έχει παίκτες, είτε δεν έχει και ο χρήστης διάλεξε θέση 1
         c.execute("INSERT INTO ranking VALUES {0};".format(newPlayer)) 
-        tk.messagebox.showinfo(master=w1, parent=positionEntryWindow, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, parent=positionEntryWindow, title='Ειδοποίηση', 
                                 message=f'Ο παίκτης {Name} {Surname} τοποθετήθηκε επιτυχώς στη θέση #{Rank}.')
 
         my_conn.commit()
@@ -182,14 +183,14 @@ def delete_player(index):
     '''Διαγράφει τον παίκτη στη θέση που δίνεται από το index και μετακινεί τους κατώτερους παίκτες μία θέση πάνω, 
     καλύπτοντας το κενό που δημιουργείται'''
     if empty_check(index): #Έλεγχος αν η θέση περιέχει άτομο
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message="Δεν υπάρχει παίκτης στη θέση που προσπαθείτε να κάνετε διαγραφή.")
     else:
         my_conn = dbconnect('tennis_club.db')
         c = my_conn.cursor()
 
         playerDBData = c.execute("SELECT * FROM ranking WHERE Position = {0};".format(index)).fetchall()
-        confirmation = tk.messagebox.askyesno(
+        confirmation = msg.askyesno(
 title='Διαγραφή Παίκτη', parent=deletion, 
 message=f'''ΠΡΟΣΟΧΉ!!!! Η διαγραφή είναι οριστική κι αμετάκλητη!
 Θα χαθούν ΌΛΑ τα δεδομένα του παίκτη.
@@ -198,7 +199,7 @@ message=f'''ΠΡΟΣΟΧΉ!!!! Η διαγραφή είναι οριστική �
         if confirmation == False:
             my_conn.commit()
             my_conn.close()
-            tk.messagebox.showerror(master=w1, parent=deletion, title='Ειδοποίηση', 
+            msg.showerror(master=w1, parent=deletion, title='Ειδοποίηση', 
                                     message="Η διαγραφή ακυρώθηκε από τον χρήστη.")
             deletionEntry.delete(0,'end')
             return
@@ -210,7 +211,7 @@ message=f'''ΠΡΟΣΟΧΉ!!!! Η διαγραφή είναι οριστική �
         my_conn.commit()
         my_conn.close()
         
-        tk.messagebox.showinfo(master=w1, parent=deletion, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, parent=deletion, title='Ειδοποίηση', 
                                 message=f'Ο παίκτης στη θέση #{index} διαγράφηκε επιτυχώς.')
         deletionEntry.delete(0,'end')
 
@@ -249,10 +250,10 @@ def win(winner_index, loser_index,today_string=today_string):
 
         #Εισαγωγή νικητή στη θέση ηττημένου
         c.execute("INSERT INTO ranking(Position, Name, Surname, Wins, Loses, Control_Date) VALUES {0};".format(entryData))
-        tk.messagebox.showinfo(master=w1, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message='Το παιχνίδι καταγράφηκε επιτυχώς και η κατάταξη ανανεώθηκε!')
     else:
-        tk.messagebox.showinfo(master=w1, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message='Το παιχνίδι καταγράφηκε επιτυχώς, χωρίς αλλαγή στην κατάταξη!')
 
     my_conn.commit()
@@ -293,7 +294,7 @@ def rank_decay(index,today_string=today_string):
     inactive_player = x.fetchall() #Αποθήκευση στοιχείων του παίκτη που υπόκειται σε rank decay
     
     if last_place == inactive_player[0][0]: #Έλεγχος για την περίπτωση που ο παίκτης είναι τελευταίος
-        tk.messagebox.showinfo(master=w1, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message="Ο παικτης {0} {1} είναι ήδη στην τελευταία θέση και δεν πέφτει περαιτέρω.".format(
             inactive_player[0][1], inactive_player[0][2]))
         c.execute("UPDATE ranking SET Control_Date='{0}' WHERE Position={1};".format(today_string, index))
@@ -349,14 +350,14 @@ def check_ranking_for_decay(today=today):
     if decaylist: #Αν η λίστα δεν είναι κενή
         st = ','.join([str(ele) for ele in decaylist])
         ts = ''.join(['Οι παίκτες στις θέσεις ', st, ' έπεσαν μία θέση λόγω αδράνειας και η κατάταξη ανανεώθηκε.'])
-        tk.messagebox.showinfo(master=w1, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message=ts)
         #Αντίστροφο πέρασμα της λίστας για αποφυγή λαθών από την αλλαγή θέσης
         for i in decaylist[::-1]: 
             rank_decay(i)            
     
     else:
-        tk.messagebox.showinfo(master=w1, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message="Δεν υπάρχει κανένας παίκτης που να υπόκειται σε μείωση θέσης λόγω αδράνειας.")
 
 
@@ -364,7 +365,7 @@ def check_ranking_for_decay(today=today):
 def b1pushed():
     flag = empty_check(1) 
     if not flag: #Έλεγχος για το αν ο πίνακας περιέχει παίκτες        
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message='''Ο πίνακας κατάταξης περιέχει ήδη παίκτες και δεν μπορεί να αρχικοποιηθεί τυχαία. 
 Παρακαλώ, διαγράψτε όλους τους παίκτες ή προσθέστε παίκτες χρησιμοποιώντας κάποια από τις επιλογές.''')
         return
@@ -397,7 +398,7 @@ def dialogInitialize1Pushed():
     player = name.split(sep=' ')
     
     if len(player) != 2: #Περίπτωση που εισαχθούν πάνω απο 1 κενά
-        tk.messagebox.showerror(master=w1, parent=dialogInitialize,  title='Ειδοποίηση', 
+        msg.showerror(master=w1, parent=dialogInitialize,  title='Ειδοποίηση', 
                                 message="Παρακαλώ εισάγετε όνομα και επίθετο χωρισμένα με ένα κενό.")
         return
     players.append(player)
@@ -414,16 +415,16 @@ def dialogInitialize2Pushed():
         dialogInitialize.destroy()
         return
     else: #Αν η λίστα players είναι κενή
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message='Δε δημιουργήθηκε κατάταξη καθώς δεν εισάγατε ονόματα.')
         dialogInitialize.destroy()
         return
 
 def b2pushed():
     global answerAddition
-    answerAddition = tk.messagebox.askyesnocancel(title='Προσθήκη Παίκτη',message='''Θέλετε να εισάγετε τον παίκτη σε συγκεκριμένη θέση;''')
+    answerAddition = msg.askyesnocancel(title='Προσθήκη Παίκτη',message='''Θέλετε να εισάγετε τον παίκτη σε συγκεκριμένη θέση;''')
     if answerAddition == None:
-        tk.messagebox.showinfo(master=w1, title='Ειδοποίηση', 
+        msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message='Η προσθήκη παίκτη ακυρώθηκε.')
         return
             
@@ -444,7 +445,7 @@ def nameEntryPushed():
     global playerAdded
     playerAdded = x.split(sep=' ')
     if len(playerAdded) != 2: 
-        tk.messagebox.showerror(master=w1, parent=nameEntered, title='Ειδοποίηση', 
+        msg.showerror(master=w1, parent=nameEntered, title='Ειδοποίηση', 
                                          message="Παρακαλώ εισάγετε όνομα και επίθετο χωρισμένα με ένα κενό.")
         return
     name,surname = playerAdded[0], playerAdded[1]
@@ -473,14 +474,14 @@ def positionPushed():
         positionEntryWindow.destroy()
         nameEntryWindow.destroy()
     except ValueError:
-        tk.messagebox.showerror(master=positionEntryWindow, parent=positionEntryWindow, title='Ειδοποίηση', 
+        msg.showerror(master=positionEntryWindow, parent=positionEntryWindow, title='Ειδοποίηση', 
                                 message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης.")
     return
     
 
 def b3pushed():
     if empty_check(1):
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
+        msg.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
     else:
         global deletion
         deletion = tk.Toplevel(w1)
@@ -501,16 +502,16 @@ def deletePushed():
         index = int(deletionEntry.get())
         delete_player(index)
     except ValueError:
-        tk.messagebox.showerror(master=w1, parent=deletion, title='Ειδοποίηση', 
+        msg.showerror(master=w1, parent=deletion, title='Ειδοποίηση', 
                                 message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης.")
         deletionEntry.delete(0,'end')
     return
 
 def b4pushed():
     if empty_check(1):
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
+        msg.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
     elif empty_check(2):
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message="Η κατάταξη περιέχει μόνο έναν παίκτη άρα δεν ορίζεται πρόκληση.")
     else:
         global challengeDialog1
@@ -533,13 +534,13 @@ def b4pushed():
 def challengePushed():
     try:
         if empty_check(int(challengeEntry.get())):
-            tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+            msg.showerror(master=w1, title='Ειδοποίηση', 
                                     message=f"Δεν υπάρχει παίκτης στη θέση #{challengeEntry.get()}")
         pr.append(int(challengeEntry.get()))
         challengeEntry.delete(0,'end')
         print(pr)
     except ValueError:
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', 
+        msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης.")
         return
     if len(pr) == 1:
@@ -553,13 +554,13 @@ def challengePushed():
 
 def b5pushed():
     if empty_check(1):
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
+        msg.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
     else:
         check_ranking_for_decay()
 
 def b6pushed():
     if empty_check(1):
-        tk.messagebox.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
+        msg.showerror(master=w1, title='Ειδοποίηση', message="Η κατάταξη δεν περιέχει παίκτες!")
     else:
         new = tk.Toplevel(w1)
         new.title("Πίνακας Κατάταξης")
