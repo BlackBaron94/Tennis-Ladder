@@ -538,7 +538,6 @@ def challengePushed():
                                     message=f"Δεν υπάρχει παίκτης στη θέση #{challengeEntry.get()}")
         pr.append(int(challengeEntry.get()))
         challengeEntry.delete(0,'end')
-        print(pr)
     except ValueError:
         msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης.")
