@@ -6,7 +6,7 @@
 
 ## Table of Contents
 - [Installation](#installation)
-- [Manual](#manuall)
+- [Manual](#manual)
 - [Contact](#contact)
 
 ## Installation
