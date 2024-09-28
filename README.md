@@ -13,7 +13,8 @@ Based off /Tennis-Ladder, this repo is the about the UI Upgrade to the main App.
 
 ## Οδηγίες Εγκατάστασης
     -Κώδικας
-        Για να τρέξει ο κώδικας χρειάζεται εγκατεστημένη έκδοση 3. Python καθώς και τις βιβλιοθήκες tkinter, sqlite3, datetime(included), random(included)
+        Για να τρέξει ο κώδικας χρειάζεται εγκατεστημένη έκδοση 3. Python καθώς και τις βιβλιοθήκες tkinter, 
+        sqlite3, datetime(included), random(included)
     -Executable
         Για να τρέξει το onefile .exe δεν χρειάζεται τίποτα από τα παραπάνω.
 
