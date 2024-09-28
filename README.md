@@ -7,7 +7,6 @@ Based off /Tennis-Ladder, this repo is the about the UI Upgrade to the main App.
 
 ## Περιεχόμενα:
     Οδηγίες εγκατάστασης
-    Επίδειξη Χρήσης
     Εγχειρίδιο Χρήσης
     Στοιχεία Επικοινωνίας
 
@@ -18,8 +17,6 @@ Based off /Tennis-Ladder, this repo is the about the UI Upgrade to the main App.
     -Executable
         Για να τρέξει το onefile .exe δεν χρειάζεται τίποτα από τα παραπάνω.
 
-## Επίδειξη Χρήσης
-    ![Alt text](image-1.png)
 
 ## Εγχειρίδιο Χρήσης
     Εγχειρίδο Χρήσης Εφαρμογής “Tennis Ladder”
