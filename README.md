@@ -1,8 +1,3 @@
-!<DOCTYPE HTML>
-<html>
-<body># Tennis-Ladder-UI-Upgrade
-Based off /Tennis-Ladder, this repo is the about the UI Upgrade to the main App.
-
 # Tennis Ladder Project
 ## Περιγραφή
 Η εφαρμογή διατηρεί κι επεξεργάζεται δεδομένα κατάταξης Τέννις. Οι δυνατότητες περιλαμβάνουν προσθήκη, 
@@ -10,11 +5,11 @@ Based off /Tennis-Ladder, this repo is the about the UI Upgrade to the main App.
 αποτελεσμάτων αγώνων. Επιπλέον, υπάρχει λειτουργία ελέγχου αδράνειας (1 μήνας) με μείωση θέσης.
 
 ## Περιεχόμενα:
-    <a href="h2">Οδηγίες εγκατάστασης</a>
-    Εγχειρίδιο Χρήσης
-    Στοιχεία Επικοινωνίας
+    [Οδηγίες εγκατάστασης](#οδηγίες-εγκατάστασης)
+    [Εγχειρίδιο Χρήσης](#εγχειρίδιο-χρήσης)
+    [Στοιχεία Επικοινωνίας](#στοιχεία-επικοινωνίας)
 
-<h2> Οδηγίες Εγκατάστασης </h2>
+## Οδηγίες Εγκατάστασης
     -Κώδικας
         Για να τρέξει ο κώδικας χρειάζεται εγκατεστημένη έκδοση 3. Python καθώς και τις βιβλιοθήκες tkinter, 
         sqlite3, datetime(included), random(included)
@@ -158,5 +153,3 @@ Based off /Tennis-Ladder, this repo is the about the UI Upgrade to the main App.
 
 ## Στοιχεία Επικοινωνίας
     Μπορείτε να επικοινωνήσετε με τον προγραμματιστή στο e-mail black_baron94@hotmail.com
-</body>
-</html>
