@@ -154,7 +154,7 @@
 ## Χρήση
     Παρακάτω φαίνονται παραδείγματα χρήσης με εικόνες.
     Αυτό είναι το κύριο μενού της εφαρμογής.
-    ![App Main Menu](https://github.com/BlackBaron94/images/blob/main/Tennis-Main-Menu.jpg)
+    ![App Main Menu](images/Tennis-Main-Menu.jpg)
 
 ## Επικοινωνία
     Μπορείτε να επικοινωνήσετε με τον προγραμματιστή στο e-mail black_baron94@hotmail.com
