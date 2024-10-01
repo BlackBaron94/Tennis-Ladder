@@ -154,7 +154,7 @@
 ## Χρήση
     Παρακάτω φαίνονται παραδείγματα χρήσης με εικόνες.
     Αυτό είναι το κύριο μενού της εφαρμογής.
-    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Main-Menu.png" alt="App Main Menu" width="500"/>
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Main-Menu.png" alt="App Main Menu"/>
 
 
 ## Επικοινωνία
