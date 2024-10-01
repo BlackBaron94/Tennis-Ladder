@@ -154,7 +154,7 @@
 ## Χρήση
     Παρακάτω φαίνονται παραδείγματα χρήσης με εικόνες.
     Αυτό είναι το κύριο μενού της εφαρμογής.
-    ![App Main Menu](https://imgur.com/a/OmfpXeb)
+    ![App Main Menu](https://i.imgur.com/QM8IJme.png)
 
 ## Επικοινωνία
     Μπορείτε να επικοινωνήσετε με τον προγραμματιστή στο e-mail black_baron94@hotmail.com
