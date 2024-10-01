@@ -262,6 +262,7 @@ def win(winner_index, loser_index,today_string=today_string):
 
 
 #Μεταθέτει όλα τα Positions κατά ένα κάτω αρχίζοντας από το big_num --> big_num+1 μέχρι ΚΑΙ το small_num-->small_num+1
+#Αφήνει δηλαδή κενή την small_num για εισαγωγή παίκτη εκεί
 def update_positions(small_num, big_num):
     '''Μετακινεί όλες τις Positions κατά μία κάτω αρχίζοντας από το big_num. 
     Προεπιλογή big_num (αν δεν υπάρχει κενό) πρέπει να είναι η τελευταία θέση. 
