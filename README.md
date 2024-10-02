@@ -76,7 +76,7 @@
 Εισάγοντας παίκτες, η λίστα γεμίζει με τα ονόματα, δείχνοντάς μας τι έχουμε εισάγει μέχρι τώρα.
 
 <div align="center">
-    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Initialization-List.jpg" alt="Tennis-Initialization-List" width="500"/>
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Initialilzation-List.jpg" alt="Tennis-Initialilzation-List" width="500"/>
 </div>
 
 Εμφανίζοντας την κατάταξη βλέπουμε την τυχαιοποίηση των εισαγωγών.
@@ -188,12 +188,13 @@
     <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Deletion-Cancelled.jpg" alt="Tennis-Deletion-Cancelled" width="500"/>
 </div>
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>    
 
 ### Διαδικασία Σύνταξης
 
 Αναπτύχθηκε και χρησιμοποιήθηκε Python Script για την αυτοματοποίηση παραγωγής των links των εικονών και του alt text του README, 
 εξασφαλίζοντας συνέπεια με την αποφυγή λαθών και εξοικονόμηση χρόνου κατά την προσθήκη πολλών στιγμιότυπων οθόνης.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Μελλοντικές Προσθήκες
 
