@@ -145,6 +145,12 @@
 
 <p style="font-size:24px;"><b> Αυτό είναι το κύριο μενού της εφαρμογής.</b></p>
 
+<p style="font-size:32px;"><b> Αυτό είναι το κύριο μενού της εφαρμογής.</b></p>
+
+
+<p><font size = "7"><b> Αυτό είναι το κύριο μενού της εφαρμογής.</b></font></p>
+
+
 <div align="center">
     <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Main-Menu.jpg" alt="App Main Menu" width="500"/>
 </div>
