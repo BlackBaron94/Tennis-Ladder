@@ -149,7 +149,7 @@
     <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Main-Menu.jpg" alt="App Main Menu" width="500"/>
 </div>
 
-### Όταν η κατάταξη είναι κενή, η εφαρμογή οι διαθέσιμες επιλογές είναι η προσθήκη παικτών και η τυχαιοποιημένη αρχικοποίηση. Η τυχαιποιημένη αρχικοποίηση είναι διαθέσιμη μόνο όταν η κατάταξη είναι άδεια. Αυτή η λειτουργία επιτρέπει την προσθήκη πολλών παικτών ταυτόχρονα. Κατά την εισαγωγή παικτών, η λίστα αρχικοποίησης ενημερώνεται με τα εισαχθέντα ονόματα, όπως φαίνεται στις εικόνες.
+### Παρακάτω φαίνεται το παράθυρο διαλόγου αρχικοποίησης κατάταξης και η εμφάνιση του πίνακα κατάταξης. Η τυχαιποιημένη αρχικοποίηση είναι διαθέσιμη μόνο όταν η κατάταξη είναι άδεια. Αυτή η λειτουργία επιτρέπει την προσθήκη πολλών παικτών ταυτόχρονα. Κατά την εισαγωγή παικτών, η λίστα αρχικοποίησης ενημερώνεται με τα εισαχθέντα ονόματα, όπως φαίνεται στις εικόνες.
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Initialization-Empty-List.jpg" alt="Tennis-Initialization-Empty-List" width="500" style="display: inline-block;"/>
@@ -181,12 +181,7 @@
 </div>
 
 
-### Ο έλεγχος για αδρανείς παίκτες αφορά το αν κάποιος παίκτης έχει τελευταία ημερομηνία δραστηριότητας παλαιότερη από 1 μήνα πριν. Η ποινή για αδράνεια συνεπάγεται πτώση μιας θέσης στην κατάταξη. Στην παρακάτω περίπτωση οι παίκτες 1, 4, 6, 8 είναι αδρανείς, αλλά ο παίκτης 8 είναι τελευταίος και δεν εφαρμόζεται ποινή.
-
-<div align="center">
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-No-Decay.jpg" alt="Tennis-No-Decay" width="500" style="display: inline-block;"/>
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Ranking-Before-Decay.jpg" alt="Tennis-Ranking-Before-Decay" width="500" style="display: inline-block;"/>
-</div>
+### Ο έλεγχος για αδρανείς παίκτες αφορά το αν κάποιος παίκτης είναι αδρανής για ένα μήνα. Η ποινή για αδράνεια συνεπάγεται πτώση μιας θέσης στην κατάταξη. Στην παρακάτω περίπτωση οι παίκτες 1, 4, 6, 8 είναι αδρανείς, αλλά ο παίκτης 8 είναι τελευταίος και δεν εφαρμόζεται ποινή.
 
 <div align="center">
    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Last-Player-Decay.jpg" alt="Tennis-Last-Player-Decay" width="500" style="display: inline-block;"/>
