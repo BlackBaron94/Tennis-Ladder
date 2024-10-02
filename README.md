@@ -29,6 +29,13 @@
 * [![SQLite3][sqlite3.python]][sqlite3-url]  
 * [![datetime][datetime.python]][datetime-url]
 
+
+### Διαδικασία Σύνταξης
+
+Αναπτύχθηκε και χρησιμοποιήθηκε ένα σύντομο Python Script για την αυτοματοποίηση παραγωγής των links των εικονών και του alt text του README 
+κατά τη σύνταξή του, εξασφαλίζοντας συνέπεια με την αποφυγή λαθών και εξοικονόμηση χρόνου κατά την προσθήκη πολλών στιγμιότυπων οθόνης.
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Οδηγίες Εγκατάστασης
@@ -197,11 +204,6 @@
   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Challenge-Canceled.jpg" alt="Tennis-Challenge-Canceled" width="500" style="display: inline-block;"/>
   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Deletion-Cancelled.jpg" alt="Tennis-Deletion-Cancelled" width="500" style="display: inline-block;"/>
 </div>
-
-### Διαδικασία Σύνταξης
-
-Αναπτύχθηκε και χρησιμοποιήθηκε Python Script για την αυτοματοποίηση παραγωγής των links των εικονών και του alt text του README 
-κατά τη σύνταξή του, εξασφαλίζοντας συνέπεια με την αποφυγή λαθών και εξοικονόμηση χρόνου κατά την προσθήκη πολλών στιγμιότυπων οθόνης.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
