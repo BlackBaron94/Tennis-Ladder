@@ -143,7 +143,7 @@
 Υπάρχει διαθέσιμο video demo [εδώ](https://drive.google.com/file/d/1DFihKx1Vyke6czRwdj_89D8w2RjAyyhL/view?usp=drive_link).
 Εναλλακτικά, παρακάτω φαίνονται παραδείγματα χρήσης με εικόνες.
 
-### Αυτό είναι το κύριο μενού της εφαρμογής.
+<p style="font-size:300%;"><b> Αυτό είναι το κύριο μενού της εφαρμογής.</b></p>
 
 <div align="center">
     <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Main-Menu.jpg" alt="App Main Menu" width="500"/>
