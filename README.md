@@ -25,15 +25,8 @@
 ### Τεχνολογίες και βιβλιοθήκες που χρησιμοποιήθηκαν
 
 * [![Python][python.org]][Python-url]
-  
 * [![tkinter][tkinter.python]][tkinter-url]
-
-Για το GUI χρησιμοποιήθηκε η tkinter, η οποία είναι η δεύτερη πιο δημοφιλής βιβλιοθήκη ανάπτυξης UI της Python.
-
-* [![SQLite3][sqlite3.python]][sqlite3-url]
-
-Η SQLite3 χρησιμοποιήθηκε για την ανάπτυξη του back-end. 
-  
+* [![SQLite3][sqlite3.python]][sqlite3-url]  
 * [![datetime][datetime.python]][datetime-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
