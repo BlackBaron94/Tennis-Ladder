@@ -287,28 +287,19 @@ def rank_decay(index,today_string=today_string):
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
 
-    x = c.execute("SELECT Position FROM ranking;")
-    last_place = x.fetchall()[-1][0]  # λήψη τελευταίας θέσης
     
     #Η Control Date ανανεώνεται ως τελευταία ημέρα τροποποίησης ώστε να μην υπόκειται σε decay ξανά πχ αύριο
     x = c.execute("SELECT * FROM ranking WHERE Position={0};".format(index))
     inactive_player = x.fetchall() #Αποθήκευση στοιχείων του παίκτη που υπόκειται σε rank decay
-    
-    if last_place == inactive_player[0][0]: #Έλεγχος για την περίπτωση που ο παίκτης είναι τελευταίος
-        msg.showinfo(master=w1, title='Ειδοποίηση', 
-                                message="Ο παικτης {0} {1} είναι ήδη στην τελευταία θέση και δεν πέφτει περαιτέρω.".format(
-            inactive_player[0][1], inactive_player[0][2]))
-        c.execute("UPDATE ranking SET Control_Date='{0}' WHERE Position={1};".format(today_string, index))
-        
-    if last_place != inactive_player[0][0]:
-        c.execute("DELETE FROM ranking WHERE Position={0};".format(index)) #Διαγραφή του παίκτη
-        #Μετακίνηση του κάτω παίκτη στην πλέον κενή θέση
-        c.execute("UPDATE ranking SET Position = {0} WHERE Position={1};".format(index,index+1)) 
-        entry = (
-            inactive_player[0][0]+1, inactive_player[0][1], inactive_player[0][2], inactive_player[0][3],
-            inactive_player[0][4], today_string)
-        #Εισαγωγή decaying παίκτη στην πλέον κενή θέση του από κάτω παικτή
-        c.execute("INSERT INTO ranking VALUES {0};".format(entry)) 
+            
+    c.execute("DELETE FROM ranking WHERE Position={0};".format(index)) #Διαγραφή του παίκτη
+    #Μετακίνηση του κάτω παίκτη στην πλέον κενή θέση
+    c.execute("UPDATE ranking SET Position = {0} WHERE Position={1};".format(index,index+1)) 
+    entry = (
+        inactive_player[0][0]+1, inactive_player[0][1], inactive_player[0][2], inactive_player[0][3],
+        inactive_player[0][4], today_string)
+    #Εισαγωγή decaying παίκτη στην πλέον κενή θέση του από κάτω παικτή
+    c.execute("INSERT INTO ranking VALUES {0};".format(entry)) 
 
     my_conn.commit()
     my_conn.close()
@@ -342,6 +333,14 @@ def check_ranking_for_decay(today=today):
         last_play_date = datetime.date(int(x[2]),int(x[1]),int(x[0])) #Μετατροπή του string σε datetime object
         days_since_last_play = (today - last_play_date).days
         if days_since_last_play > 30:
+            if ranking[-1][0] == index: #Έλεγχος για την περίπτωση που ο παίκτης είναι τελευταίος
+                cursor.execute("SELECT Name, Surname FROM ranking WHERE Position={0};".format(index))
+                last_player = cursor.fetchone()
+                msg.showinfo(master=w1, title='Ειδοποίηση', 
+                                        message="Ο παικτης {0} {1} είναι ήδη στην τελευταία θέση και δεν πέφτει περαιτέρω.".format(
+                    last_player[0], last_player[1]))
+                cursor.execute("UPDATE ranking SET Control_Date='{0}' WHERE Position={1};".format(today_string, index))
+                break
             #Προστίθεται στη λίστα, η αλλαγή δεν γίνεται εδώ γιατί οδηγεί σε logical error του περάσματος for
             decaylist.append(index) 
     
