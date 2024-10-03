@@ -71,32 +71,44 @@
 
 ## Λειτουργίες
 
-1. Αρχικοποίηση κατάταξης
+1. **Αρχικοποίηση κατάταξης**
 
 (Διαθέσιμη μόνο με άδεια κατάταξη) Εισαγωγή πολλών παικτών ταυτόχρονα σε τυχαιοποιημένες θέσεις. 
 
-2. Προσθήκη παίκτη
+---
+
+2. **Προσθήκη παίκτη**
 
 Εισαγωγή παίκτη είτε σε συγκεκριμένη θέση εντός των ορίων της κατάταξης, είτε στο τέλος της. 
 
-3. Διαγραφή παίκτη
+---
+
+3. **Διαγραφή παίκτη**
 
 Διαγραφή βάσει θέσης κατάταξης.
 
-4. Έλεγχος και καταγραφή αποτελέσματος πρόκλησης
+---
+
+4. **Έλεγχος και καταγραφή αποτελέσματος πρόκλησης**
 
 Εισάγονται ο παίκτης που προκαλεί και ο παίκτης που δέχεται την πρόκληση. Ελέγχεται αν η πρόκληση είναι
 έγκυρη βάσει κανονισμών. Εισάγεται νικητής και τροποποιείται η κατάταξη καταλλήλως.
 
-5. Έλεγχος κατάταξης για αδρανείς παίκτες
+---
+
+5. **Έλεγχος κατάταξης για αδρανείς παίκτες**
 
 Ελέγχεται η κατάταξη για αδρανείς παίκτες, εφαρμόζεται ποινή και ανανεώνεται η κατάταξη.
 
-6. Εμφάνιση κατάταξης
+---
+
+6. **Εμφάνιση κατάταξης**
 
 Εμφανίζει πίνακα με τα στοιχεία των παικτών. Παρουσιάζονται θέσεις κατάταξης, ονοματεπώνυμα, νίκες και ήττες σε πίνακα.
 
-7. Έξοδος
+---
+
+7. **Έξοδος**
 
 Τερματισμός του προγράμματος.
 
@@ -153,7 +165,7 @@
 ---
 
 <div align="center">
-    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Main-Menu.jpg" alt="Tennis-Main-Menu" width="500"/>
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Main-Menu.jpg" alt="Tennis-Main-Menu" width="500"/>
 </div>
 
 ---
@@ -164,12 +176,12 @@
 ---
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Initialization-Empty-List.jpg" alt="Tennis-Initialization-Empty-List" width="500" style="display: inline-block;"/>
-  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Initialilzation-List.jpg" alt="Tennis-Initialilzation-List" width="500" style="display: inline-block;"/>
+  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Initialization-Empty-List.jpg" alt="Tennis-Initialization-Empty-List" width="500" style="display: inline-block;"/>
+  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Initialilzation-List.jpg" alt="Tennis-Initialilzation-List" width="500" style="display: inline-block;"/>
 </div>
 
 <div align="center">
-    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Randomized-Ranking.jpg" alt="Tennis-Randomized-Ranking" width="500"/>
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Randomized-Ranking.jpg" alt="Tennis-Randomized-Ranking" width="500"/>
 </div>
 
 ---
@@ -179,8 +191,8 @@
 ---
 
 <div align="center">
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Added-Player.jpg" alt="Tennis-Added-Player" width="500" style="display: inline-block;"/>
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Delete-Player-Question.jpg" alt="Tennis-Delete-Player-Question" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Added-Player.jpg" alt="Tennis-Added-Player" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Delete-Player-Question.jpg" alt="Tennis-Delete-Player-Question" width="500" style="display: inline-block;"/>
 </div>
 
 ---
@@ -190,13 +202,13 @@
 ---
 
 <div align="center">
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Challenger.jpg" alt="Tennis-Challenger" width="500" style="display: inline-block;"/>
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Challenged.jpg" alt="Tennis-Challenged" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Challenger.jpg" alt="Tennis-Challenger" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Challenged.jpg" alt="Tennis-Challenged" width="500" style="display: inline-block;"/>
 </div>
 
 <div align="center">
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Challenge-Result-Querry.jpg" alt="Tennis-Challenge-Result-Querry" width="500" style="display: inline-block;"/>
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Result-Registered.jpg" alt="Tennis-Result-Registered" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Challenge-Result-Querry.jpg" alt="Tennis-Challenge-Result-Querry" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Result-Registered.jpg" alt="Tennis-Result-Registered" width="500" style="display: inline-block;"/>
 </div>
 
 ---
@@ -206,8 +218,8 @@
 ---
 
 <div align="center">
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Last-Player-Decay.jpg" alt="Tennis-Last-Player-Decay" width="500" style="display: inline-block;"/>
-   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Decay-YES.jpg" alt="Tennis-Decay-YES" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Last-Player-Decay.jpg" alt="Tennis-Last-Player-Decay" width="500" style="display: inline-block;"/>
+   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Decay-YES.jpg" alt="Tennis-Decay-YES" width="500" style="display: inline-block;"/>
 </div>
 
 ---
@@ -217,13 +229,13 @@
 ---
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Wrong-Name.jpg" alt="Tennis-Wrong-Name" width="500" style="display: inline-block;"/>
-  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Wrong-Rank.jpg" alt="Tennis-Wrong-Rank" width="500" style="display: inline-block;"/>
+  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Wrong-Name.jpg" alt="Tennis-Wrong-Name" width="500" style="display: inline-block;"/>
+  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Wrong-Rank.jpg" alt="Tennis-Wrong-Rank" width="500" style="display: inline-block;"/>
 </div>
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Challenge-Canceled.jpg" alt="Tennis-Challenge-Canceled" width="500" style="display: inline-block;"/>
-  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages//Tennis-Deletion-Cancelled.jpg" alt="Tennis-Deletion-Cancelled" width="500" style="display: inline-block;"/>
+  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Challenge-Canceled.jpg" alt="Tennis-Challenge-Canceled" width="500" style="display: inline-block;"/>
+  <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Deletion-Cancelled.jpg" alt="Tennis-Deletion-Cancelled" width="500" style="display: inline-block;"/>
 </div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
