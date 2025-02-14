@@ -52,7 +52,7 @@ def challenge(p1,p2):
         return
 
     
-        
+# Σύνδεση με τη βάση δεδομένων        
 def dbconnect(db_file):
     conn = None
     try:
@@ -63,24 +63,24 @@ def dbconnect(db_file):
     return conn
 
 
-#Δημιουργία ΔΒ + Πίνακα
+# Δημιουργία ΔΒ + Πίνακα
 def create_table():
     '''Δημιουργία πίνακα με Position, Name, Surname, Wins, Loses, Control_Date 
     όπου Control_Date τελευταία μέρα που έπαιξε αγώνα, ημέρα ένταξης στο club ή τελευταία φορά που υπέστη decay. 
     Position = Primary key'''
-    my_conn = dbconnect('tennis_club.db') #Δημιουργεί ΔΒ αν δεν υπάρχει
+    my_conn = dbconnect('tennis_club.db') # Δημιουργεί ΔΒ αν δεν υπάρχει
     
     sql_query = "CREATE TABLE IF NOT EXISTS ranking (Position INTEGER PRIMARY KEY, Name VARCHAR(128),"\
                 " Surname VARCHAR(128), Wins INTEGER, Loses INTEGER, Control_Date TEXT);" 
     c = my_conn.cursor()
 
-    c.execute(sql_query) #Δημιουργία Πίνακα με τη Θέση ως Primary Key
+    c.execute(sql_query) # Δημιουργία Πίνακα με τη Θέση ως Primary Key
     
     my_conn.commit()
     my_conn.close()
 
 
-#Αρχικοποίηση κατάταξης
+# Αρχικοποίηση κατάταξης
 def initialization(initializationPlayers,today_string=today_string):
     '''Δέχεται λίστα με όνομα και επίθετο χωρισμένα με κενό και την εκχωρεί στον πίνακα'''
     random.shuffle(players)
@@ -98,7 +98,7 @@ def initialization(initializationPlayers,today_string=today_string):
 
 
 
-#Print όλη την κατάταξη
+# Print όλη την κατάταξη
 def print_():
     '''Τυπώνει την κατάταξη με όλα τα στοιχεία σε μορφοποιημένη ευανάγνωστη διάταξη (πλην Control_Date, 
     για αυτή χρησιμοποιήστε print_ranking())'''
@@ -119,8 +119,8 @@ def print_():
     return
 
     
-#Εισαγωγή παίκτη στο τέλος της κατάταξης, προεπιλεγμένες τιμές για Wins & Loses = 0
-#Control_Date σήμερα ως ημέρα ένταξης
+# Εισαγωγή παίκτη στο τέλος της κατάταξης, προεπιλεγμένες τιμές για Wins & Loses = 0
+# Control_Date σήμερα ως ημέρα ένταξης
 def insert_bottom(Name='', Surname='', Wins=0, Loses=0, Control_Date=today_string):
     '''Εισαγωγή παίκτη στο τέλος της κατάταξης. Εισάγετε Όνομα και Επώνυμο. 
     Νίκες και ήττες έχουν προεπιλεγμένες τιμές 0.'''
@@ -141,18 +141,18 @@ def insert_bottom(Name='', Surname='', Wins=0, Loses=0, Control_Date=today_strin
     my_conn.close()
 
 
-#Εισαγωγή παίκτη σε επιλεγμένη θέση στην κατάταξη, προεπιλεγμένες τιμές για Wins & Loses = 0
+# Εισαγωγή παίκτη σε επιλεγμένη θέση στην κατάταξη, προεπιλεγμένες τιμές για Wins & Loses = 0
 def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_string):
     '''Εισαγωγή παίκτη σε συγκεκριμένη θέση λόγω γνωστής αντικειμενικά υψηλότερης απόδοσης. 
     Ο παίκτης που βρισκόταν στη θέση θα μεταφερθεί μία θέση κάτω, όπως κι όλοι οι χαμηλότεροι παίκες.'''
 
-    if empty_check(Rank-1) and Rank != 1: #Αν προσπαθεί να βάλει τον παίκτη σε θέση πάνω από την οποία δεν 
-    #υπάρχει άλλος παίκτης
+    if empty_check(Rank-1) and Rank != 1: # Αν προσπαθεί να βάλει τον παίκτη σε θέση πάνω από την οποία δεν 
+    # υπάρχει άλλος παίκτης
         msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message=f"Δεν υπάρχει άλλος παίκτης πριν τη θέση που προσπαθείτε να καταχωρήσετε τον παίκτη {Name} {Surname}.")
 
     else:
-        if not empty_check(1): #Αν η λίστα έχει παίκτες
+        if not empty_check(1): # Αν η λίστα έχει παίκτες
             my_conn = dbconnect('tennis_club.db')
             c = my_conn.cursor()
 
@@ -161,14 +161,14 @@ def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_
             last_place = c.execute("SELECT Position FROM ranking ORDER BY Position DESC LIMIT 1;").fetchone()[0]
             my_conn.close()
             update_positions(Rank, last_place) #...για να τεθεί παράμετρος εδώ, που μεταθέτονται όλοι οι παίκτες 
-            #μία θέση κάτω αφήνοντας τη θέση ενδιαφέροντος κενή
+            # μία θέση κάτω αφήνοντας τη θέση ενδιαφέροντος κενή
 
         my_conn = dbconnect('tennis_club.db')
         c = my_conn.cursor()
 
         newPlayer = (Rank, Name, Surname, Wins, Loses, today_string)
         
-        #Εισαγωγή στην κατάταξη είτε η λίστα έχει παίκτες, είτε δεν έχει και ο χρήστης διάλεξε θέση 1
+        # Εισαγωγή στην κατάταξη είτε η λίστα έχει παίκτες, είτε δεν έχει και ο χρήστης διάλεξε θέση 1
         c.execute("INSERT INTO ranking VALUES {0};".format(newPlayer)) 
         msg.showinfo(master=w1, parent=positionEntryWindow, title='Ειδοποίηση', 
                                 message=f'Ο παίκτης {Name} {Surname} τοποθετήθηκε επιτυχώς στη θέση #{Rank}.')
@@ -178,11 +178,11 @@ def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_
 
 
 
-#Διαγραφή παίκτη
+# Διαγραφή παίκτη
 def delete_player(index):
     '''Διαγράφει τον παίκτη στη θέση που δίνεται από το index και μετακινεί τους κατώτερους παίκτες μία θέση πάνω, 
     καλύπτοντας το κενό που δημιουργείται'''
-    if empty_check(index): #Έλεγχος αν η θέση περιέχει άτομο
+    if empty_check(index): # Έλεγχος αν η θέση περιέχει άτομο
         msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message="Δεν υπάρχει παίκτης στη θέση που προσπαθείτε να κάνετε διαγραφή.")
     else:
@@ -216,7 +216,7 @@ message=f'''ΠΡΟΣΟΧΉ!!!! Η διαγραφή είναι οριστική �
         deletionEntry.delete(0,'end')
 
 
-#Καταγραφή νίκης με παραμέτρους τις θέσεις τους ΠΡΙΝ την αλλαγή κατάταξης
+# Καταγραφή νίκης με παραμέτρους τις θέσεις τους ΠΡΙΝ την αλλαγή κατάταξης
 def win(winner_index, loser_index,today_string=today_string):
     '''Εισάγετε την έως τώρα θέση νικητή και μετά ηττημένου. Ο νικητής θα λάβει τη θέση του ηττημένου. 
     Ο ηττημένος και όλοι οι παίκτες μεταξύ των δύο θέσεων θα μετακινηθούν μία θέση κάτω.'''
@@ -234,21 +234,21 @@ def win(winner_index, loser_index,today_string=today_string):
         sql_query = "SELECT * FROM Ranking WHERE Position={0};".format(winner_index)  #Προσωρινή αποθήκευση νικητή
         x = c.execute(sql_query)
 
-        playerDBData = x.fetchall() #Επιστρέφει λίστα, με το playerDBData[0] να είναι πλειάδα στοιχείων του νικητή        
+        playerDBData = x.fetchall() # Επιστρέφει λίστα, με το playerDBData[0] να είναι πλειάδα στοιχείων του νικητή        
         c.execute("DELETE FROM ranking WHERE Position={0};".format(winner_index)) #Διαγραφή νικητή από προηγούμενη θέση
         entryData = (loser_index, playerDBData[0][1], playerDBData[0][2], playerDBData[0][3], playerDBData[0][4], playerDBData[0][5]) #Νέα πλειάδα για αλλαγή "Position"
         
         my_conn.commit()
         my_conn.close()
 
-        #Κλήση συνάρτησης ανακατάταξης που κατεβάζει τους παίκτες κατά μία θέση από 
-        #την winner_index μέχρι ΚΑΙ τη loser_index
+        # Κλήση συνάρτησης ανακατάταξης που κατεβάζει τους παίκτες κατά μία θέση από 
+        # την winner_index μέχρι ΚΑΙ τη loser_index
         update_positions(loser_index, winner_index) 
 
         my_conn = dbconnect('tennis_club.db')
         c = my_conn.cursor()
 
-        #Εισαγωγή νικητή στη θέση ηττημένου
+        # Εισαγωγή νικητή στη θέση ηττημένου
         c.execute("INSERT INTO ranking(Position, Name, Surname, Wins, Loses, Control_Date) VALUES {0};".format(entryData))
         msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message='Το παιχνίδι καταγράφηκε επιτυχώς και η κατάταξη ανανεώθηκε!')
@@ -261,8 +261,8 @@ def win(winner_index, loser_index,today_string=today_string):
     
 
 
-#Μεταθέτει όλα τα Positions κατά ένα κάτω αρχίζοντας από το big_num --> big_num+1 μέχρι ΚΑΙ το small_num-->small_num+1
-#Αφήνει δηλαδή κενή την small_num για εισαγωγή παίκτη εκεί
+# Μεταθέτει όλα τα Positions κατά ένα κάτω αρχίζοντας από το big_num --> big_num+1 μέχρι ΚΑΙ το small_num-->small_num+1
+# Αφήνει δηλαδή κενή την small_num για εισαγωγή παίκτη εκεί
 def update_positions(small_num, big_num):
     '''Μετακινεί όλες τις Positions κατά μία κάτω αρχίζοντας από το big_num. 
     Προεπιλογή big_num (αν δεν υπάρχει κενό) πρέπει να είναι η τελευταία θέση. 
@@ -270,49 +270,49 @@ def update_positions(small_num, big_num):
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
 
-    counter = big_num + 1 #Μετρητής τιμής Position που θέλουμε να θέσουμε
-    #Πρώτα το big_num entry γίνεται big_num+1 για να μην έχουμε σύγκρουση Primal Keys
+    counter = big_num + 1 # Μετρητής τιμής Position που θέλουμε να θέσουμε
+    # Πρώτα το big_num entry γίνεται big_num+1 για να μην έχουμε σύγκρουση Primal Keys
     for p in range(big_num, small_num-1, -1): 
             c.execute('UPDATE ranking SET Position = {0} WHERE Position={1}'.format(counter, p)) #Το p είναι μετρητής τρέχουσας θέσης για το WHERE και μειώνεται σε κάθε loop
-            counter -= 1 #Μείωση counter για σωστή εισαγωγή Position
+            counter -= 1 # Μείωση counter για σωστή εισαγωγή Position
 
     my_conn.commit()
     my_conn.close()
 
 
 
-#Μεταθέτει τον παίκτη που υπόκειται σε decay λόγω αδράνειας μία θέση κάτω ανεβάζοντας τον κάτω στη θέση του
+# Μεταθέτει τον παίκτη που υπόκειται σε decay λόγω αδράνειας μία θέση κάτω ανεβάζοντας τον κάτω στη θέση του
 def rank_decay(index,today_string=today_string):
     '''Ο παίκτης της θέσης index πέφτει μία θέση λόγω αδράνειας κι ο κάτω του ανεβαίνει στη θέση του.'''
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
 
     
-    #Η Control Date ανανεώνεται ως τελευταία ημέρα τροποποίησης ώστε να μην υπόκειται σε decay ξανά πχ αύριο
+    # Η Control Date ανανεώνεται ως τελευταία ημέρα τροποποίησης ώστε να μην υπόκειται σε decay ξανά πχ αύριο
     x = c.execute("SELECT * FROM ranking WHERE Position={0};".format(index))
-    inactive_player = x.fetchall() #Αποθήκευση στοιχείων του παίκτη που υπόκειται σε rank decay
+    inactive_player = x.fetchall() # Αποθήκευση στοιχείων του παίκτη που υπόκειται σε rank decay
             
     c.execute("DELETE FROM ranking WHERE Position={0};".format(index)) #Διαγραφή του παίκτη
-    #Μετακίνηση του κάτω παίκτη στην πλέον κενή θέση
+    # Μετακίνηση του κάτω παίκτη στην πλέον κενή θέση
     c.execute("UPDATE ranking SET Position = {0} WHERE Position={1};".format(index,index+1)) 
     entry = (
         inactive_player[0][0]+1, inactive_player[0][1], inactive_player[0][2], inactive_player[0][3],
         inactive_player[0][4], today_string)
-    #Εισαγωγή decaying παίκτη στην πλέον κενή θέση του από κάτω παικτή
+    # Εισαγωγή decaying παίκτη στην πλέον κενή θέση του από κάτω παικτή
     c.execute("INSERT INTO ranking VALUES {0};".format(entry)) 
 
     my_conn.commit()
     my_conn.close()
 
 
-#Απαραιτητο για τις υπόλοιπες εσωτερικές λειτουργίες συναρτήσεων
+# Απαραιτητο για τις υπόλοιπες εσωτερικές λειτουργίες συναρτήσεων
 def empty_check(index):
     '''Ελέγχει αν ο πίνακας έχει παίκτη στη θέση που καταχωρείται κι επιστρέφει boolean type variable'''
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
     
     c.execute("SELECT Position FROM ranking WHERE Position={0};".format(index))
-    empty_check = c.fetchall() #Πλειάδα με νούμερο για Position ή κενή αν δεν υπάρχει παίκτης
+    empty_check = c.fetchall() # Πλειάδα με νούμερο για Position ή κενή αν δεν υπάρχει παίκτης
     flag = len(empty_check) == 0
     
     my_conn.close()
@@ -324,16 +324,16 @@ def check_ranking_for_decay(today=today):
     conn = dbconnect('tennis_club.db')
     cursor = conn.cursor()
 
-    decaylist = [] #Λίστα με παίκτες που θα υποστούν decay
+    decaylist = [] # Λίστα με παίκτες που θα υποστούν decay
     cursor.execute("SELECT Position, Control_Date FROM ranking;")
     ranking = cursor.fetchall()
     
     for index, date in ranking:
-        x = date.split(sep='/') #Διαχωρίζει το string
+        x = date.split(sep='/') # Διαχωρίζει το string
         last_play_date = datetime.date(int(x[2]),int(x[1]),int(x[0])) #Μετατροπή του string σε datetime object
         days_since_last_play = (today - last_play_date).days
         if days_since_last_play > 30:
-            if ranking[-1][0] == index: #Έλεγχος για την περίπτωση που ο παίκτης είναι τελευταίος
+            if ranking[-1][0] == index: # Έλεγχος για την περίπτωση που ο παίκτης είναι τελευταίος
                 cursor.execute("SELECT Name, Surname FROM ranking WHERE Position={0};".format(index))
                 last_player = cursor.fetchone()
                 msg.showinfo(master=w1, title='Ειδοποίηση', 
@@ -341,18 +341,18 @@ def check_ranking_for_decay(today=today):
                     last_player[0], last_player[1]))
                 cursor.execute("UPDATE ranking SET Control_Date='{0}' WHERE Position={1};".format(today_string, index))
                 break
-            #Προστίθεται στη λίστα, η αλλαγή δεν γίνεται εδώ γιατί οδηγεί σε logical error του περάσματος for
+            # Προστίθεται στη λίστα, η αλλαγή δεν γίνεται εδώ γιατί οδηγεί σε logical error του περάσματος for
             decaylist.append(index) 
     
     conn.commit()
     conn.close()    
     
-    if decaylist: #Αν η λίστα δεν είναι κενή
+    if decaylist: # Αν η λίστα δεν είναι κενή
         st = ','.join([str(ele) for ele in decaylist])
         ts = ''.join(['Οι παίκτες στις θέσεις ', st, ' έπεσαν μία θέση λόγω αδράνειας και η κατάταξη ανανεώθηκε.'])
         msg.showinfo(master=w1, title='Ειδοποίηση', 
                                 message=ts)
-        #Αντίστροφο πέρασμα της λίστας για αποφυγή λαθών από την αλλαγή θέσης
+        # Αντίστροφο πέρασμα της λίστας για αποφυγή λαθών από την αλλαγή θέσης
         for i in decaylist[::-1]: 
             rank_decay(i)            
     
@@ -364,7 +364,7 @@ def check_ranking_for_decay(today=today):
 
 def b1pushed():
     flag = empty_check(1) 
-    if not flag: #Έλεγχος για το αν ο πίνακας περιέχει παίκτες        
+    if not flag: # Έλεγχος για το αν ο πίνακας περιέχει παίκτες        
         msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message='''Ο πίνακας κατάταξης περιέχει ήδη παίκτες και δεν μπορεί να αρχικοποιηθεί τυχαία. 
 Παρακαλώ, διαγράψτε όλους τους παίκτες ή προσθέστε παίκτες χρησιμοποιώντας κάποια από τις επιλογές.''')
@@ -397,7 +397,7 @@ def dialogInitialize1Pushed():
     bleh.delete(0,'end')
     player = name.split(sep=' ')
     
-    if len(player) != 2: #Περίπτωση που εισαχθούν πάνω απο 1 κενά
+    if len(player) != 2: # Περίπτωση που εισαχθούν πάνω απο 1 κενά
         msg.showerror(master=w1, parent=dialogInitialize,  title='Ειδοποίηση', 
                                 message="Παρακαλώ εισάγετε όνομα και επίθετο χωρισμένα με ένα κενό.")
         return
@@ -414,7 +414,7 @@ def dialogInitialize2Pushed():
         initialization(players)
         dialogInitialize.destroy()
         return
-    else: #Αν η λίστα players είναι κενή
+    else: # Αν η λίστα players είναι κενή
         msg.showerror(master=w1, title='Ειδοποίηση', 
                                 message='Δε δημιουργήθηκε κατάταξη καθώς δεν εισάγατε ονόματα.')
         dialogInitialize.destroy()
