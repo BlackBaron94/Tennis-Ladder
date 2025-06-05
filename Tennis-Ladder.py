@@ -10,13 +10,14 @@ today = datetime.date.today()
 today_string = "{0}/{1}/{2}".format(today.day,today.month,today.year)
 
 
-def challenge(p1,p2):
+def challenge(window, p1, p2):
     """
     Συνάρτηση που ελέγχει την πρόκληση και κάνει τις απαραίτητες αλλαγές 
     ή ενημερώνει τον χρήστη για το λάθος.
     
     
     Args:
+        window (Top Level): Παράθυρο διαλόγου πρόκλησης.
         p1 (int): Θέση του παίκτη που θέτει την πρόκληση.
         p2 (int): Θέση του παίκτη που δέχεται την πρόκληση.
         
@@ -33,7 +34,7 @@ def challenge(p1,p2):
         
         msg.showerror(
             master=main_window, 
-            parent=challengeDialog, 
+            parent=window, 
             title='Ειδοποίηση', 
             message=f'''Ο παίκτης που προκαλείται βρίσκεται πάνω από {allowed_challenge_distance} θέσεις πάνω από τον παίκτη που προκαλεί.
 Η πρόκληση είναι άκυρη.''')
@@ -43,7 +44,7 @@ def challenge(p1,p2):
     elif p1 < p2:
         msg.showerror(
             master=main_window,
-            parent=challengeDialog, 
+            parent=window, 
             title='Ειδοποίηση', 
             message="Ο παίκτης που προκαλείται είναι κάτω από τον παίκτη που προκαλεί. \nΗ πρόκληση είναι άκυρη.")
         return
@@ -52,7 +53,7 @@ def challenge(p1,p2):
     elif p1 == p2:
         msg.showerror(
             master=main_window, 
-            parent=challengeDialog, 
+            parent=window, 
             title='Ειδοποίηση', 
             message='Λάθος καταχώρηση, ο παίκτης που προκαλεί είναι ο παίκτης που δέχεται την πρόκληση.')
         return
@@ -60,23 +61,23 @@ def challenge(p1,p2):
     # Ενημέρωση αποδοχής πρόκλησης και ερώτηση έκβασης αγώνα
     answer = msg.askyesnocancel(
         master=main_window, 
-        parent=challengeDialog, 
+        parent=window, 
         title='Αποτέλεσμα Αγώνα',
         message=f'''Η πρόκληση είναι αποδεκτή.
 Νίκησε ο παίκτης στη θέση #{p1} που έκανε την πρόκληση;'''
         )
     
     if answer == True:
-        win(p1, p2)
+        win(window, p1, p2)
         return
     if answer == False:
-        win(p2,p1)
+        win(window, p2, p1)
         return
     # Αν ο χρήστης κλείσει το παράθυρο χωρίς να απαντήσει για νικητή
     if answer == None:
         msg.showerror(
             master=main_window,
-            parent=challengeDialog, 
+            parent=window, 
             title='Ειδοποίηση', 
             message="Ο αγώνας δεν καταγράφηκε, ακύρωση από τον χρήστη."
             )
@@ -133,6 +134,7 @@ def initialization(initializationPlayers,today_string=today_string):
     Args:
         initializationPlayers (list): Λίστα με στοιχεία str όνομα και επίθετο.
         today_string (str): Σημερινή ημερομηνία σε μορφή "{ημέρα}/{μήνας}/{έτος}".
+        
     Returns:
         None.
     """
@@ -165,11 +167,18 @@ def initialization(initializationPlayers,today_string=today_string):
         )
 
 
-def fill_tree():
+def fill_tree(tree):
     """
     Ενημερώνει το tree του UI εκχωρώντας σε αυτό τα στοιχεία όλων των παικτών 
     (πλην Control_Date, για αυτή χρησιμοποιήστε την εσωτερική συνάρτηση 
     print_ranking())
+    
+    
+    Args:
+        tree (Treeview Object): Πίνακας στον οποίο μπαίνουν τα δεδομένα της ΒΔ.
+        
+    Returns:
+        None.
     """
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
@@ -190,17 +199,19 @@ def fill_tree():
 
     
 
-def insert_bottom(Name='', Surname='', Wins=0, Loses=0, Control_Date=today_string):
+def insert_bottom(window, name, surname, wins=0, loses=0, control_date=today_string):
     """
     Εισαγωγή παίκτη στο τέλος της κατάταξης, προεπιλεγμένες τιμές για Wins & 
     Loses = 0. Control_Date σήμερα ως ημέρα ένταξης. Εκχωρεί τα δεδομένα στη ΒΔ.
     
+    
     Args:
-        Name (str): Όνομα παίκτη.
-        Surname (str): Επίθετο παίκτη.
-        Wins (int): Νίκες παίκτη. Προεπιλεγμένη τιμή 0.
-        Loses (int): Ήττες παίκτη. Προεπιλεγμένη τιμή 0.
-        Control_Date (str): Ημερομηνία τελευταίας δραστηριότητας.
+        window (Top Level Object): Παράθυρο στο οποίο προβάλλονται τυχών μηνύματα
+        name (str): Όνομα παίκτη.
+        surname (str): Επίθετο παίκτη.
+        wins (int): Νίκες παίκτη. Προεπιλεγμένη τιμή 0.
+        loses (int): Ήττες παίκτη. Προεπιλεγμένη τιμή 0.
+        control_date (str): Ημερομηνία τελευταίας δραστηριότητας.
         Προεπιλεγμένη τιμή η σημερινή ημέρα ως ημέρα ένταξης σε μορφή 
         "{ημέρα}/{μήνας}/{έτος}".
     
@@ -216,27 +227,27 @@ def insert_bottom(Name='', Surname='', Wins=0, Loses=0, Control_Date=today_strin
     
     newPlayer = (
         new_last_place, 
-        Name, 
-        Surname, 
-        Wins, 
-        Loses, 
-        today_string
+        name, 
+        surname, 
+        wins, 
+        loses, 
+        control_date
         ) #Πλειάδα στοιχείων παίκτη
     c.execute("INSERT INTO ranking VALUES {0};".format(newPlayer)) #Εκχώρηση παίκτη σε αυτή τη θέση
     
     # Μήνυμα ενημέρωσης επιτυχούς εισαγωγής
     msg.showinfo(
         master=main_window,
-        parent=nameEntryWindow, 
+        parent=window, 
         title='Ειδοποίηση', 
-        message=f'Ο {Name} {Surname} τοποθετήθηκε επιτυχώς στη θέση #{new_last_place}.'
+        message=f'Ο {name} {surname} τοποθετήθηκε επιτυχώς στη θέση #{new_last_place}.'
         )
     
     my_conn.commit()
     my_conn.close()
 
 
-def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_string):
+def insert_place(window, rank, name='', surname='', wins=0, loses=0, control_date=today_string):
     """
     Εισαγωγή παίκτη σε επιλεγμένη θέση στην κατάταξη της ΒΔ, προεπιλεγμένες τιμές 
     για Wins & Loses = 0, προεπιλεγμένη τιμή για ημέρα δραστηριότητας η σημερινή ως
@@ -259,12 +270,12 @@ def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_
     
     # Αν προσπαθεί να βάλει τον παίκτη σε θέση πάνω από την οποία δεν υπάρχει 
     # άλλος παίκτης
-    if empty_check(Rank-1) and Rank != 1: 
+    if empty_check(rank-1) and rank != 1: 
         msg.showerror(
             master=main_window, 
-            parent=positionEntryWindow,
+            parent=window,
             title='Ειδοποίηση', 
-            message=f"Δεν υπάρχει άλλος παίκτης πριν τη θέση που προσπαθείτε να καταχωρήσετε τον παίκτη {Name} {Surname}."
+            message=f"Δεν υπάρχει άλλος παίκτης πριν τη θέση που προσπαθείτε να καταχωρήσετε τον παίκτη {name} {surname}."
             )
 
     else:
@@ -278,7 +289,7 @@ def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_
             my_conn.close()
             # Δημιουργείται κενό βάσει της τελευταίας θέσης και της θέσης που 
             # θα εισαχθεί ο παίκτης
-            update_positions(Rank, last_place) 
+            update_positions(rank, last_place) 
         
         # Αν η λίστα δεν περιέχει παίκτες και πέρασε τον προηγούμενο έλεγχο, 
         # ο χρήστης ζήτησε να εισάγει στη θέση 1 τον παίκτη και δε χρειάζεται
@@ -286,23 +297,23 @@ def insert_place(Rank, Name='', Surname='', Wins=0, Loses=0, Control_Date=today_
         my_conn = dbconnect('tennis_club.db')
         c = my_conn.cursor()
 
-        newPlayer = (Rank, Name, Surname, Wins, Loses, today_string)
+        newPlayer = (rank, name, surname, wins, loses, today_string)
         
         # Εισαγωγή στην κατάταξη είτε η λίστα έχει παίκτες, 
         # είτε δεν έχει και ο χρήστης διάλεξε θέση 1
         c.execute("INSERT INTO ranking VALUES {0};".format(newPlayer)) 
         msg.showinfo(
             master=main_window, 
-            parent=positionEntryWindow, 
+            parent=window, 
             title='Ειδοποίηση', 
-            message=f'Ο παίκτης {Name} {Surname} τοποθετήθηκε επιτυχώς στη θέση #{Rank}.'
+            message=f'Ο παίκτης {name} {surname} τοποθετήθηκε επιτυχώς στη θέση #{rank}.'
             )
 
         my_conn.commit()
         my_conn.close()
 
 
-def delete_player(index):
+def delete_player(index, window):
     """
     Διαγράφει τον παίκτη στη θέση που δίνεται από το index και μετακινεί τους 
     κατώτερους παίκτες μία θέση πάνω, καλύπτοντας το κενό που δημιουργείται 
@@ -311,6 +322,7 @@ def delete_player(index):
     
     Args:
         index (int): Θέση κατάταξης του προς διαγραφή παίκτη.
+        window (Top Level Object): Παράθυρο διαλόγου διαγραφής.
         
     Returns:
         None.
@@ -320,7 +332,7 @@ def delete_player(index):
     if empty_check(index): 
         msg.showerror(
             master=main_window, 
-            parent=deletionDialog,
+            parent=window,
             title='Ειδοποίηση', 
             message="Δεν υπάρχει παίκτης στη θέση που προσπαθείτε να κάνετε διαγραφή."
             )
@@ -332,7 +344,7 @@ def delete_player(index):
         # Παράθυρο επιβεβαίωσης διαγραφής
         confirmation = msg.askyesno(
             master=main_window,
-            parent=deletionDialog,
+            parent=window,
             title='Διαγραφή Παίκτη', 
             message=f'''ΠΡΟΣΟΧΉ!!!! Η διαγραφή είναι οριστική κι αμετάκλητη!
 Θα χαθούν ΌΛΑ τα δεδομένα του παίκτη.
@@ -344,11 +356,11 @@ def delete_player(index):
             my_conn.close()
             msg.showerror(
                 master=main_window, 
-                parent=deletionDialog, 
+                parent=window, 
                 title='Ειδοποίηση', 
                 message="Η διαγραφή ακυρώθηκε από τον χρήστη."
                 )
-            deletionEntry.delete(0,'end')
+            window.deletionEntry.delete(0,'end')
             return
         
         c.execute("DELETE FROM ranking WHERE Position={0};".format(index)) #Διαγραφή παίκτη
@@ -359,14 +371,14 @@ def delete_player(index):
         # Μήνυμα ειδοποίησης επιτυχούς διαγραφής
         msg.showinfo(
             master=main_window, 
-            parent=deletionDialog, 
+            parent=window,
             title='Ειδοποίηση', 
             message=f'Ο παίκτης στη θέση #{index} διαγράφηκε επιτυχώς.'
             )
-        deletionEntry.delete(0,'end')
+        window.deletionEntry.delete(0,'end')
 
 
-def win(winner_index, loser_index,today_string=today_string):
+def win(window, winner_index, loser_index,today_string=today_string):
     """
     Καταγράφει τη νίκη με παραμέτρους τις θέσεις των παικτών πριν την αλλαγή της 
     κατάταξης και ανανεώνει τις νίκες και ήττες του κάθε παίκτη στη ΒΔ.
@@ -382,6 +394,7 @@ def win(winner_index, loser_index,today_string=today_string):
     
     
     Args:
+        window (Top Level): Παράθυρο διαλόγου πρόκλησης.
         winner_index (int): Θέση του παίκτη που νίκησε τον αγώνα.
         loser_index (int): Θέση του παίκτη που έχασε τον αγώνα.
         today_string (str): Ημερομηνία αγώνα. Προεπιλεγμένη
@@ -437,7 +450,7 @@ def win(winner_index, loser_index,today_string=today_string):
         # Ενημέρωση χρήστη για αλλαγές στην κατάταξη
         msg.showinfo(
             master=main_window,
-            parent=challengeDialog, 
+            parent=window, 
             title='Ειδοποίηση', 
             message='Το παιχνίδι καταγράφηκε επιτυχώς και η κατάταξη ανανεώθηκε!'
             )
@@ -445,11 +458,11 @@ def win(winner_index, loser_index,today_string=today_string):
     else:
         msg.showinfo(
             master=main_window,
-            parent=challengeDialog,
+            parent=window,
             title='Ειδοποίηση', 
             message='Το παιχνίδι καταγράφηκε επιτυχώς, χωρίς αλλαγή στην κατάταξη!'
             )
-    challengeDialog.destroy()
+    window.destroy()
     my_conn.commit()
     my_conn.close()
     
@@ -649,17 +662,8 @@ def initializeBTNpushed():
             )
         return
     
-    # Μεταβλητή για αποθήκευση παικτών προς αρχικοποίηση
-    global players
-    players = []
-    # Δυναμική μεταβλητή StringVar για προβολή εισαχθέντων 
-    # παικτών καθώς αυτοί εισάγονται
-    global initializationList
-    initializationList = tk.StringVar()
-    initializationList.set('Κενή Λίστα Παικτών')
     
     # Παράθυρο διαλόγου αρχικοποίησης
-    global dialogInitialize
     dialogInitialize = tk.Toplevel(main_window)
     dialogInitialize.title('Αρχικοποίηση λίστας')
     dialogInitialize.geometry('400x500+700+350')
@@ -669,34 +673,39 @@ def initializeBTNpushed():
         lambda event: dialogInitialize.destroy()
         )
     
+    # Μεταβλητή για αποθήκευση παικτών προς αρχικοποίηση ως πεδίο του παραθύρου
+    dialogInitialize.players = []
+    # Δυναμική μεταβλητή StringVar για προβολή εισαχθέντων 
+    # παικτών καθώς αυτοί εισάγονται, ως πεδίο του παραθύρου
+    dialogInitialize.initializationList = tk.StringVar()
+    dialogInitialize.initializationList.set('Κενή Λίστα Παικτών')
     # Πεδίο εισαγωγής
-    global initializationEntry
-    initializationEntry = tk.Entry(
+    dialogInitialize.initializationEntry = tk.Entry(
         dialogInitialize,
         justify='center', 
         font='Times 16',
         selectborderwidth=3
         )
-    initializationEntry.pack(pady=10)
-    initializationEntry.focus_set()
+    dialogInitialize.initializationEntry.pack(pady=10)
+    dialogInitialize.initializationEntry.focus_set()
     # Keybind για καταχώρηση παίκτη στη λίστα με Enter
-    initializationEntry.bind(
+    dialogInitialize.initializationEntry.bind(
         "<Return>", 
-        lambda event: dialogInitialize_AddPlayerBTNPushed()
+        lambda event: dialogInitialize_AddPlayerBTNPushed(dialogInitialize)
         )
     # Κουμπί καταχώρησης παίκτη στη λίστα
     tk.Button(
         dialogInitialize, 
         text="Καταχώρηση Παίκτη", 
         font='Times 16', 
-        command = dialogInitialize_AddPlayerBTNPushed
+        command = lambda: dialogInitialize_AddPlayerBTNPushed(dialogInitialize)
         ).pack(pady=5)
     # Κουμπί τέλους καταχωρήσεων και αρχικοποίησης κατάταξης
     tk.Button(
         dialogInitialize,
         text="Τέλος Καταχωρήσεων",
         font = 'Times 16', 
-        command = dialogInitialize_EntryEndBTNPushed
+        command = lambda: dialogInitialize_EntryEndBTNPushed(dialogInitialize)
         ).pack(pady=5)
     ttk.Separator(
         dialogInitialize,
@@ -705,62 +714,75 @@ def initializeBTNpushed():
     # Δυναμικό Label που αλλάζει με τις καταχωρήσεις
     tk.Label(
         dialogInitialize, 
-        textvariable = initializationList,
+        textvariable = dialogInitialize.initializationList,
         font = 'Times 16',
         justify='center'
         ).pack()     
     dialogInitialize.mainloop()
     
 
-def dialogInitialize_AddPlayerBTNPushed():
+def dialogInitialize_AddPlayerBTNPushed(window):
     """
     Συνάρτηση κουμπιού καταχώρησης παίκτη στο παράθυρο διαλόγου αρχικοποίησης.
     Ελέγχει το όνομα που εισήχθη, ενημερώνει σε περίπτωση λάθους, ανανεώνει 
     δυναμική λίστα για παρουσίαση παικτών που έχουν ήδη εισαχθεί για αρχικοποίηση.
+    
+    
+    Args:
+        window (Top Level Object): Παράθυρο διαλόγου αρχικοποίησης.
+        
+    Returns:
+        None.
     """
-    name = initializationEntry.get()
-    initializationEntry.delete(0,'end')
+    name = window.initializationEntry.get()
+    window.initializationEntry.delete(0,'end')
     player = name.split(sep=' ')
     
     # Περίπτωση που εισαχθούν πάνω απο 1 κενά
     if len(player) != 2: 
         msg.showerror(
-            master=dialogInitialize, 
-            parent=dialogInitialize,  
+            master=window, 
+            parent=window,  
             title='Ειδοποίηση', 
             message="Παρακαλώ εισάγετε όνομα και επίθετο χωρισμένα με ένα κενό."
             )
         return
     # Προσθήκη παίκτη στη λίστα
-    players.append(player)
-    global initializationList
+    window.players.append(player)
     # Ελέγχει αν το δυναμικό Label έδειχνε κενή λίστα και απαιτεί πρώτη
     # μορφοποίηση κι όχι απλά προσθήκη παίκτη σε αυτήν
-    if initializationList.get() == 'Κενή Λίστα Παικτών':
-        initializationList.set("Λίστα Παικτών\n")
+    if window.initializationList.get() == 'Κενή Λίστα Παικτών':
+        window.initializationList.set("Λίστα Παικτών\n")
     # Παίρνει τα δεδομένα που είχε το δυναμικό Label 
     # για να προσθέσει το νέο δεδομένο
-    string = '\n'.join([initializationList.get(),name])
+    string = '\n'.join([window.initializationList.get(),name])
     # Προσθήκη νέου παίκτη
-    initializationList.set(string)
-    initializationEntry.focus_set()
+    window.initializationList.set(string)
+    window.initializationEntry.focus_set()
     return
 
-def dialogInitialize_EntryEndBTNPushed():
+def dialogInitialize_EntryEndBTNPushed(window):
     """
     Συνάρτηση κουμπιού τέλους καταχωρήσεων στο παράθυρο διαλόγου αρχικοποίησης.
     Ελέγχει αν έχει εισαχθεί παίκτης στη λίστα. Αν δεν έχει εισαχθεί έστω ένας, 
     ενημερώνει με το κατάλληλο μήνυμα. Σε αντίθετη περίπτωση, προχωράει στην
     αρχικοποιήση της κατάταξης με τη λίστα παικτών που δόθηκε.
+    
+    
+    Args:
+        window (Top Level Object): Παράθυρο διαλόγου αρχικοποίησης.
+        
+    Returns:
+        None.
     """
     # Ελέγχει αν η λίστα players είναι κενή
-    if players:
-        initialization(players)
-        dialogInitialize.destroy()
+    if window.players:
+        initialization(window.players)
+        window.destroy()
         return
     
     else: 
-        dialogInitialize.destroy()
+        window.destroy()
         # Σε περίπτωση που ήταν κενή ενημερώνει τον χρήστη με το κατάλληλο μήνυμα
         msg.showerror(
             master=main_window, 
@@ -775,8 +797,9 @@ def addPlayerBTNpushed():
     αν ο παίκτης θα εισαχθεί στο τέλος της κατάταξης ή σε συγκεκριμένη θέση,
     δημιουργεί παράθυρο διαλόγου για εισαγωγή ονοματεπωνύμου παίκτη.
     """
-    # Ερώτηση εισαγωγής παίκτη σε συγκεκριμένη θέση
-    global answerAddition
+    
+   
+    # Απάντηση χρήστη περί εισαγωγής παίκτη σε συγκεκριμένη θέση.
     answerAddition = msg.askyesnocancel(
         title='Προσθήκη Παίκτη',
         message='''Θέλετε να εισάγετε τον παίκτη σε συγκεκριμένη θέση;'''
@@ -790,7 +813,6 @@ def addPlayerBTNpushed():
         return
             
     # Παράθυρο διαλόγου εισαγωγής ονοματεπωνύμου παίκτη
-    global nameEntryWindow
     nameEntryWindow = tk.Toplevel(main_window)
     nameEntryWindow.geometry("550x150+650+350")
     nameEntryWindow.title('Προσθήκη Παίκτη')
@@ -798,34 +820,36 @@ def addPlayerBTNpushed():
         "<Escape>", 
         lambda event: nameEntryWindow.destroy()
         )
+    # Ορίζεται ως πεδίο του αντικειμένου Top Level για να περαστεί 
+    # στις συναρτήσεις που την χρησιμοποιούν
+    nameEntryWindow.answerAddition = answerAddition
     tk.Label(
         nameEntryWindow, 
         font=defaultFont, 
         text = "Δώστε όνομα και επίθετο παίκτη που θέλετε να εισάγετε: "
         ).pack(pady=5)
     # Πεδίο εισαγωγής
-    global nameEntered
-    nameEntered = tk.Entry(
+    nameEntryWindow.nameEntered = tk.Entry(
         nameEntryWindow, 
         font=defaultFont, 
         justify='center'
         )
-    nameEntered.pack(pady=5)
-    nameEntered.focus_set()
-    nameEntered.bind(
+    nameEntryWindow.nameEntered.pack(pady=5)
+    nameEntryWindow.nameEntered.focus_set()
+    nameEntryWindow.nameEntered.bind(
         "<Return>", 
-        lambda event: addPlayerDialog_nameEntryBTNpushed()
+        lambda event: addPlayerDialog_nameEntryBTNpushed(nameEntryWindow)
         )
     # Κουμπί εισαγωγής ονοματεπωνύμου παίκτη
     tk.Button(
         nameEntryWindow, 
         text='Προσθήκη', 
         font=defaultFont, 
-        command=addPlayerDialog_nameEntryBTNpushed
+        command= lambda: addPlayerDialog_nameEntryBTNpushed(nameEntryWindow)
         ).pack(pady=5)
     
 
-def addPlayerDialog_nameEntryBTNpushed():
+def addPlayerDialog_nameEntryBTNpushed(window):
     """
     Συνάρτηση για το κουμπί διαλόγου εισαγωγής παίκτη. Ελέγχει αν το όνομα και το
     επίθετο δόθηκαν σε αποδεκτή μορφή και ενημερώνει τον χρήστη. 
@@ -835,17 +859,24 @@ def addPlayerDialog_nameEntryBTNpushed():
     
     Αν ο χρήστης απάντησε πως θέλει να βάλει τον παίκτη σε συγκεκριμένη θέση, 
     ζητάει τη θέση με νέο παράθυρο διαλόγου.
+    
+    
+    Args:
+        window (Top Level Object): Παράθυρο εισαγωγής ονοματεπωνύμου παίκτη.
+        
+    Returns: 
+        None.
     """
-    playerNameEntered = nameEntered.get()
-    nameEntered.delete(0,'end')
-    global playerAdded
+    playerNameEntered = window.nameEntered.get()
+    window.nameEntered.delete(0,'end')
+    
     playerAdded = playerNameEntered.split(sep=' ')
     # Έλεγχος σωστής εισαγωγής ονοματεπωνύμου
     if len(playerAdded) != 2: 
         # Ενημέρωση χρήστη με κατάλληλο μήνυμα
         msg.showerror(
             master=main_window, 
-            parent=nameEntered, 
+            parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ εισάγετε όνομα και επίθετο χωρισμένα με ένα κενό."
             )
@@ -853,14 +884,13 @@ def addPlayerDialog_nameEntryBTNpushed():
     name, surname = playerAdded[0], playerAdded[1]
     # Αν ο χρήστης απάντησε πως δε θέλει να βάλει σε συγκεκριμένη θέση
     # τον παίκτη, μπαίνει στην τελευταία θέση
-    if answerAddition == False:
-        insert_bottom(name,surname)
-        nameEntryWindow.destroy()
+    if window.answerAddition == False:
+        insert_bottom(window, name, surname)
+        window.destroy()
     # Αν ο χρήστης απάντησε πως θέλει να βάλει σε συγκεκριμένη θέση τον παίκτη
-    elif answerAddition == True:
+    elif window.answerAddition == True:
         # Δημιουργία παραθύρου διαλόγου
-        global positionEntryWindow
-        positionEntryWindow = tk.Toplevel(nameEntryWindow)
+        positionEntryWindow = tk.Toplevel(window)
         positionEntryWindow.geometry("600x150+625+450")
         positionEntryWindow.title("Προσθήκη Παίκτη σε Θέση")
         positionEntryWindow.bind(
@@ -874,51 +904,66 @@ def addPlayerDialog_nameEntryBTNpushed():
             text='Δώστε τη θέση κατάταξης του παίκτη που θέλετε να προσθέσετε: '
             ).pack(pady=5)
         # Πεδίο εισαγωγής
-        global positionEntry
-        positionEntry = tk.Entry(
+        
+        positionEntryWindow.positionEntry = tk.Entry(
             positionEntryWindow, 
             font=defaultFont, 
             justify='center'
             )
-        positionEntry.pack(pady=5)
-        positionEntry.focus_set()
-        positionEntry.bind(
+        positionEntryWindow.positionEntry.pack(pady=5)
+        positionEntryWindow.positionEntry.focus_set()
+        positionEntryWindow.positionEntry.bind(
             "<Return>", 
-            lambda event: addPlayerDialog_positionEntryBTNpushed()
+            lambda event: addPlayerDialog_positionEntryBTNpushed(
+                name, 
+                surname, 
+                positionEntryWindow
+                )
             )
         # Κουμπί καταχώρησης θέσης εισαγωγής παίκτη προς προσθήκη
         tk.Button(
             positionEntryWindow, 
             font=defaultFont, 
             text='OK',
-            command=addPlayerDialog_positionEntryBTNpushed
+            command= lambda: addPlayerDialog_positionEntryBTNpushed(
+                name,
+                surname,
+                positionEntryWindow
+                )
             ).pack(pady=5)
         
     return
 
-def addPlayerDialog_positionEntryBTNpushed():
+def addPlayerDialog_positionEntryBTNpushed(name, surname, window):
     """
     Συνάρτηση κουμπιού εισαγωγής θέσης για το παράθυρο διαλόγου προσθήκης παίκτη
     σε συγκεκριμένη θέση.
     Ελέγχει αν η εισαγωγή είναι σωστή και ανανεώνει τη ΒΔ καλώντας την 
     insert_place() ή ενημερώνει τον χρήστη με μήνυμα σφάλματος.
+    
+    
+    Args:
+        name (str): Το όνομα του παίκτη που θα εισαχθεί.
+        surname (str): Το επώνυμο του παίκτη που θα εισαχθεί.
+        window (Top Level object): Το παράθυρο διαλόγου εισαγωγής θέσης.
+        
+    Returns:
+        None.
     """
     
     # Try block για εισαγωγή μη ακεραίου αριθμού.
     # Ο αμυντικός προγραμματισμός για εισαγωγή αποδεκτής τιμής 
     # γίνεται μέσω της insert_place
     try:
-        positionEntered = int(positionEntry.get())
-        positionEntry.delete(0,'end')
-        name,surname = playerAdded[0], playerAdded[1]
-        insert_place(positionEntered,name,surname)
-        positionEntryWindow.destroy()
-        nameEntryWindow.destroy()
+        positionEntered = int(window.positionEntry.get())
+        window.positionEntry.delete(0,'end')
+        insert_place(window, positionEntered, name, surname)
+        window.destroy()
     except ValueError:
         # Ενημέρωση χρήστη για μη αποδεκτή εισαγωγή θέση (όχι ακέραιος)
         msg.showerror(
-            master=positionEntryWindow, 
-            parent=positionEntryWindow, 
+            master=main_window, 
+            parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης."
             )
@@ -943,7 +988,6 @@ def delPlayerBTNpushed():
     # Η κατάταξη περιέχει παίκτες
     else:
         # Δημιουργία παραθύρου διαλόγου
-        global deletionDialog
         deletionDialog = tk.Toplevel(main_window)
         deletionDialog.geometry("550x200+650+450")
         deletionDialog.title('Διαγραφή Παίκτη')
@@ -957,29 +1001,25 @@ def delPlayerBTNpushed():
             font = 'Times 14'
             ).pack(pady=20)
         # Πεδίο εισαγωγής
-        global deletionEntry
-        deletionEntry = tk.Entry(
+        
+        deletionDialog.deletionEntry = tk.Entry(
             deletionDialog,
             justify = 'center', 
             font=defaultFont
             )
-        deletionEntry.pack(pady=5)
-        deletionEntry.focus_set()
-        deletionEntry.bind(
+        deletionDialog.deletionEntry.pack(pady=5)
+        deletionDialog.deletionEntry.focus_set()
+        deletionDialog.deletionEntry.bind(
             "<Return>", 
-            lambda event: deletionDialog_deleteBTNPushed()
+            lambda event: deletionDialog_deleteBTNPushed(deletionDialog)
             )
         # Κουμπί διαγραφής
         tk.Button(
             deletionDialog, 
             text='Διαγραφή', 
             font='Times 16', 
-            command=deletionDialog_deleteBTNPushed
+            command= lambda: deletionDialog_deleteBTNPushed(deletionDialog)
             ).pack(side='left',padx=60)
-        deletionDialog.bind(
-            "<Escape>", 
-            lambda event: deletionDialog.destroy() 
-            )
         # Κουμπί ακύρωσης διαγραφής
         tk.Button(
             deletionDialog, 
@@ -991,27 +1031,34 @@ def delPlayerBTNpushed():
         deletionDialog.mainloop()
         
 
-def deletionDialog_deleteBTNPushed():
+def deletionDialog_deleteBTNPushed(window):
     """
     Συνάρτηση για το κουμπί διαγραφής του παραθύρου διαλόγου διαγραφής παίκτη.
     Ελέγχει ότι ο χρήστης εισάγει ακέραιο αριθμό για τη θέση κατάταξης ή 
     ειδοποιεί με το κατάλληλο μήνυμα σφάλματος. Ενημερώνει τη ΒΔ καλώντας την
     delete_player().
+    
+    
+    Args:
+        window (Top Level Object): Παράθυρο διαλόγου διαγραφής.
+        
+    Returns: 
+        None.
     """
     # Ελέγχει πως ο χρήστης εισήγαγε ακέραιο αριθμό
     # Ο έλεγχος αποδεκτής τιμής γίνεται από την delete_player()
     try:
-        index = int(deletionEntry.get())
-        delete_player(index)
+        index = int(window.deletionEntry.get())
+        delete_player(index, window)
     except ValueError:
         # Ειδοποίηση χρήστη για λάθος εισαγωγή θέσης
         msg.showerror(
             master=main_window, 
-            parent=deletionDialog, 
+            parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης."
             )
-        deletionEntry.delete(0,'end')
+        window.deletionEntry.delete(0,'end')
     return
 
 def challengeBTNpushed():
@@ -1040,7 +1087,6 @@ def challengeBTNpushed():
     # Περιέχει πάνω από 1 παίκτη
     else:
         # Δημιουργία παραθύρου διαλόγου για την πρόκληση
-        global challengeDialog
         challengeDialog = tk.Toplevel(main_window)
         challengeDialog.geometry("650x200+650+450")
         challengeDialog.title("Καταγραφη Πρόκλησης")
@@ -1050,42 +1096,39 @@ def challengeBTNpushed():
             )
         # Τίθεται ως δυναμικό Label για να αλλάζει 
         # μετά την καταχώρηση του πρώτου παίκτη
-        global challengeLabel
-        challengeLabel = tk.StringVar()
-        challengeLabel.set('Δώστε τη θέση κατάταξης του παίκτη που προκαλεί: ')
+        challengeDialog.challengeLabel = tk.StringVar()
+        challengeDialog.challengeLabel.set('Δώστε τη θέση κατάταξης του παίκτη που προκαλεί: ')
         tk.Label(
             master=challengeDialog, 
-            textvariable= challengeLabel, 
+            textvariable= challengeDialog.challengeLabel, 
             font=defaultFont
             ).pack(pady = 10)
         # Πεδίο εισαγωγής
-        global challengeEntry
-        challengeEntry = tk.Entry(
+        challengeDialog.challengeEntry = tk.Entry(
             master=challengeDialog, 
             justify='center', 
             font=defaultFont
             )
-        challengeEntry.pack(pady = 10)
-        challengeEntry.focus_set()
-        challengeEntry.bind(
+        challengeDialog.challengeEntry.pack(pady = 10)
+        challengeDialog.challengeEntry.focus_set()
+        challengeDialog.challengeEntry.bind(
             "<Return>", 
-            lambda event: challengeDialog_challengeBTNPushed()
+            lambda event: challengeDialog_challengeBTNPushed(challengeDialog)
             )
+        # Μεταβλητή που αποθηκεύει τις θέσεις των παικτών
+        # που εμπλέκονται στην πρόκληση ως πεδίου του Top Level object
+        challengeDialog.players_in_challenge = []
         # Κουμπί καταχώρησης θέσης παίκτη που εμπλέκεται στην πρόκληση
         tk.Button(
             master=challengeDialog, 
             text='OK', 
             font = defaultFont, 
-            command=challengeDialog_challengeBTNPushed
+            command= lambda: challengeDialog_challengeBTNPushed(challengeDialog)
             ).pack(pady = 10)
-        # Μεταβλητή που αποθηκεύει τις θέσεις των παικτών
-        # που εμπλέκονται στην πρόκληση
-        global players_in_challenge
-        players_in_challenge = []
         challengeDialog.mainloop()
 
 
-def challengeDialog_challengeBTNPushed():
+def challengeDialog_challengeBTNPushed(window):
     """
     Συνάρτηση κουμπιού καταχώρησης θέσης παίκτη που συμμετέχει στην πρόκληση. 
     
@@ -1098,40 +1141,51 @@ def challengeDialog_challengeBTNPushed():
     πρώτος παίκτης, ελέγχεται και πάλι η τιμή και καλεί την challenge() που 
     ελέγχει την πρόκληση σύμφωνα με τους κανόνες και ενημερώνει τη ΒΔ ή 
     ενημερώνει τον χρήστη με το κατάλληλο μήνυμα σφάλματος.
+    
+    
+    Args:
+        window (Top Level): Παράθυρο διαλόγου καταγραφής πρόκλησης.
+        
+    Returns:
+        None.
     """
     # Έλεγχοι εισαγωγής για valid θέση και για εισαγωγή ακεραίου.
     try:
         # Ελέγχει πως η θέση που εισήχθη περιέχει παίκτη ή ενημερώνει με
         # το ανάλογο μήνυμα σφάλματος
-        if empty_check(int(challengeEntry.get())):
+        if empty_check(int(window.challengeEntry.get())):
             msg.showerror(
                 master=main_window, 
-                parent=challengeDialog, 
+                parent=window, 
                 title='Ειδοποίηση', 
-                message=f"Δεν υπάρχει παίκτης στη θέση #{challengeEntry.get()}"
+                message=f"Δεν υπάρχει παίκτης στη θέση #{window.challengeEntry.get()}"
                 )
             return
         # Προσθήκη εισαχθείσας θέσεις στη λίστα παικτών που εμπλέκονται
-        players_in_challenge.append(int(challengeEntry.get()))
-        challengeEntry.delete(0,'end')
+        window.players_in_challenge.append(int(window.challengeEntry.get()))
+        window.challengeEntry.delete(0,'end')
     except ValueError:
         # Ενημέρωση χρήστη για εισαγωγή μη ακεραίου
         # Ο έλεγχος των τιμών της πρόκλησης γίνεται από το try block και
         # από την challenge()
         msg.showerror(
             master=main_window, 
-            parent=challengeDialog, 
+            parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης."
             )
         return
     # Εάν έχει λάβει μόνο έναν παίκτη, ενημερώνει το δυναμικό Label
-    if len(players_in_challenge) == 1:
-        challengeLabel.set('Δώστε τη θέση κατάταξης του παίκτη που δέχεται την πρόκληση:')
+    if len(window.players_in_challenge) == 1:
+        window.challengeLabel.set('Δώστε τη θέση κατάταξης του παίκτη που δέχεται την πρόκληση:')
     # Εάν έχει λάβει 2 παίκτες, καλεί την challenge()
-    elif len(players_in_challenge) == 2:
-        challenge(players_in_challenge[0],players_in_challenge[1])
-        challengeDialog.destroy()
+    elif len(window.players_in_challenge) == 2:
+        challenge(
+            window, 
+            window.players_in_challenge[0], 
+            window.players_in_challenge[1]
+            )
+        window.destroy()
         
     return
 
@@ -1182,7 +1236,6 @@ def showRankingBTNpushed():
         style = ttk.Style()
         style.configure("mystyle.Treeview",font=('Times',16),rowheight=30)
         # Δημιουργία Treeview με τις απαιτούμενες στύλες και μορφοποιήσεις
-        global tree
         tree = ttk.Treeview(
             ranking_table, 
             style="mystyle.Treeview", 
@@ -1206,7 +1259,7 @@ def showRankingBTNpushed():
         tree.heading('Νίκες', text = 'Νίκες')
         tree.heading('Ήττες', text = 'Ήττες')
         # Καλεί την fill_tree() να γεμίσει το tree με τα δεδομένα της ΒΔ
-        fill_tree()
+        fill_tree(tree)
         tree.pack(fill='both',expand=1)
         ranking_table.focus_set()
         ranking_table.mainloop()
