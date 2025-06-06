@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox as msg
+from tkinter import ttk, messagebox as msg, PhotoImage
 import sqlite3
 from sqlite3 import Error
 import datetime
@@ -10,7 +9,7 @@ today = datetime.date.today()
 today_string = "{0}/{1}/{2}".format(today.day,today.month,today.year)
 
 
-def challenge(window, p1, p2):
+def challenge(window, player_1, player_2):
     """
     Συνάρτηση που ελέγχει την πρόκληση και κάνει τις απαραίτητες αλλαγές 
     ή ενημερώνει τον χρήστη για το λάθος.
@@ -18,8 +17,8 @@ def challenge(window, p1, p2):
     
     Args:
         window (Top Level): Παράθυρο διαλόγου πρόκλησης.
-        p1 (int): Θέση του παίκτη που θέτει την πρόκληση.
-        p2 (int): Θέση του παίκτη που δέχεται την πρόκληση.
+        player_1 (int): Θέση του παίκτη που θέτει την πρόκληση.
+        player_2 (int): Θέση του παίκτη που δέχεται την πρόκληση.
         
     Returns:
         None.
@@ -28,9 +27,9 @@ def challenge(window, p1, p2):
     # Υπολογισμός της διαφοράς των θέσεων που μπορεί να γίνει μια πρόκληση. 
     # Συγκεκριμένα για τις θέσεις 1 - 9 η διαφορά μπορεί να είναι μέχρι 3 θέσεις,
     # ενώ για τις θέσεις από 9 και πάνω, μέχρι 4 θέσεις.
-    allowed_challenge_distance = 4 if p1 > 9 else 3
+    allowed_challenge_distance = 4 if player_1 > 9 else 3
     # Έλεγχος πως επιτρέπεται η διαφορά θέσεων
-    if p1 - p2 > allowed_challenge_distance:
+    if player_1 - player_2 > allowed_challenge_distance:
         
         msg.showerror(
             master=main_window, 
@@ -41,7 +40,7 @@ def challenge(window, p1, p2):
         return
     
     # Έλεγχος πως ο παίκτης που προκαλεί είναι κάτω από τον παίκτη που προκαλείται
-    elif p1 < p2:
+    elif player_1 < player_2:
         msg.showerror(
             master=main_window,
             parent=window, 
@@ -50,7 +49,7 @@ def challenge(window, p1, p2):
         return
     
     # Έλεγχος για περίπτωση εισαγωγής ίδιου παίκτη
-    elif p1 == p2:
+    elif player_1 == player_2:
         msg.showerror(
             master=main_window, 
             parent=window, 
@@ -64,14 +63,14 @@ def challenge(window, p1, p2):
         parent=window, 
         title='Αποτέλεσμα Αγώνα',
         message=f'''Η πρόκληση είναι αποδεκτή.
-Νίκησε ο παίκτης στη θέση #{p1} που έκανε την πρόκληση;'''
+Νίκησε ο παίκτης στη θέση #{player_1} που έκανε την πρόκληση;'''
         )
     
     if answer == True:
-        win(window, p1, p2)
+        win(window, player_1, player_2)
         return
     if answer == False:
-        win(window, p2, p1)
+        win(window, player_2, player_1)
         return
     # Αν ο χρήστης κλείσει το παράθυρο χωρίς να απαντήσει για νικητή
     if answer == None:
@@ -83,7 +82,6 @@ def challenge(window, p1, p2):
             )
         return
 
-    
       
 def dbconnect(db_file):
     """
@@ -125,14 +123,14 @@ def create_table():
     my_conn.close()
 
 
-def initialization(initializationPlayers,today_string=today_string):
+def initialization(initialization_players,today_string=today_string):
     """
     Συνάρτηση αρχικοποίησης κατάταξης. Δέχεται λίστα με όνομα και επίθετο 
     χωρισμένα με κενό και την εκχωρεί στον πίνακα της ΒΔ με ανακατεμένη σειρά.
     
     
     Args:
-        initializationPlayers (list): Λίστα με στοιχεία str όνομα και επίθετο.
+        initialization_players (list): Λίστα με στοιχεία str όνομα και επίθετο.
         today_string (str): Σημερινή ημερομηνία σε μορφή "{ημέρα}/{μήνας}/{έτος}".
         
     Returns:
@@ -140,23 +138,23 @@ def initialization(initializationPlayers,today_string=today_string):
     """
     
     # Τυχαιοποίηση σειράς παικτών
-    random.shuffle(initializationPlayers)
+    random.shuffle(initialization_players)
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
     
     # Εισαγωγή παικτών στη ΒΔ με τυχαία σειρά
-    for i,player in enumerate(initializationPlayers):
+    for i,player in enumerate(initialization_players):
         # Το i είναι το index + 1 για να ξεκινάει από τη θέση 1
         # Όνομα, επώνυμο, νίκες, ήττες, ημερομηνία δραστηριότητας
         entry = (
             i + 1, 
-            initializationPlayers[i][0], 
-            initializationPlayers[i][1], 
+            initialization_players[i][0], 
+            initialization_players[i][1], 
             0, 
             0, 
             today_string
             )
-        c.execute("INSERT INTO ranking VALUES {0}".format(entry))
+        c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?)", entry)
    
     my_conn.commit()
     my_conn.close()
@@ -184,22 +182,31 @@ def fill_tree(tree):
     c = my_conn.cursor()
 
     # Παίρνει όλα τα δεδομένα από τη ΒΔ
-    allDBData = c.execute("SELECT * FROM ranking;")
-    rankingList = []    
+    all_DB_data = c.execute("SELECT * FROM ranking;")
+    ranking_list = []    
+    icon = PhotoImage(file="pencil-button.png")
     
-    for x1,x2,x3,x4,x5,x6 in allDBData.fetchall():
-        rankingList.append((x1,x2,x3,x4,x5))
+    for rank,name,surname,wins,loses,control_date in all_DB_data.fetchall():
+        ranking_list.append((
+            rank,
+            name,
+            surname,
+            wins,
+            loses))
     
+    
+    
+    tree.image_refs = []
     # Εισάγει τα δεδομένα στο tree
-    for item in rankingList:
-        tree.insert('',tk.END,values=item)
+    for item in ranking_list:
+        tree.insert('', tk.END, text = '', image = icon, values=item)
+        tree.image_refs.append(icon)
     
     my_conn.close()
     return
-
     
 
-def insert_bottom(window, name, surname, wins=0, loses=0, control_date=today_string):
+def insert_player_at_end(window, name, surname, wins=0, loses=0, control_date=today_string):
     """
     Εισαγωγή παίκτη στο τέλος της κατάταξης, προεπιλεγμένες τιμές για Wins & 
     Loses = 0. Control_Date σήμερα ως ημέρα ένταξης. Εκχωρεί τα δεδομένα στη ΒΔ.
@@ -223,9 +230,9 @@ def insert_bottom(window, name, surname, wins=0, loses=0, control_date=today_str
 
     # Αν η πρώτη θέση είναι κενή δε χρειάζεται να ληφθεί το δεδομένο της 
     # τελευταίας θέσης, παίρνει τιμή 1. Καταχώρηση νέας τελευταίας θέσης
-    new_last_place = 1 if empty_check(1) else c.execute("SELECT Position FROM ranking;").fetchall()[-1][0] + 1
+    new_last_place = 1 if is_position_empty(1) else c.execute("SELECT Position FROM ranking;").fetchall()[-1][0] + 1
     
-    newPlayer = (
+    new_player = (
         new_last_place, 
         name, 
         surname, 
@@ -233,7 +240,7 @@ def insert_bottom(window, name, surname, wins=0, loses=0, control_date=today_str
         loses, 
         control_date
         ) #Πλειάδα στοιχείων παίκτη
-    c.execute("INSERT INTO ranking VALUES {0};".format(newPlayer)) #Εκχώρηση παίκτη σε αυτή τη θέση
+    c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?);",new_player) #Εκχώρηση παίκτη σε αυτή τη θέση
     
     # Μήνυμα ενημέρωσης επιτυχούς εισαγωγής
     msg.showinfo(
@@ -247,7 +254,7 @@ def insert_bottom(window, name, surname, wins=0, loses=0, control_date=today_str
     my_conn.close()
 
 
-def insert_place(window, rank, name='', surname='', wins=0, loses=0, control_date=today_string):
+def insert_player_at_position(window, rank, name='', surname='', wins=0, loses=0, control_date=today_string):
     """
     Εισαγωγή παίκτη σε επιλεγμένη θέση στην κατάταξη της ΒΔ, προεπιλεγμένες τιμές 
     για Wins & Loses = 0, προεπιλεγμένη τιμή για ημέρα δραστηριότητας η σημερινή ως
@@ -270,7 +277,7 @@ def insert_place(window, rank, name='', surname='', wins=0, loses=0, control_dat
     
     # Αν προσπαθεί να βάλει τον παίκτη σε θέση πάνω από την οποία δεν υπάρχει 
     # άλλος παίκτης
-    if empty_check(rank-1) and rank != 1: 
+    if is_position_empty(rank-1) and rank != 1: 
         msg.showerror(
             master=main_window, 
             parent=window,
@@ -280,7 +287,7 @@ def insert_place(window, rank, name='', surname='', wins=0, loses=0, control_dat
 
     else:
         # Αν η λίστα έχει παίκτες πρέπει να μετακινηθούν όλοι μία θέση κάτω
-        if not empty_check(1): 
+        if not is_position_empty(1): 
             my_conn = dbconnect('tennis_club.db')
             c = my_conn.cursor()
 
@@ -297,11 +304,11 @@ def insert_place(window, rank, name='', surname='', wins=0, loses=0, control_dat
         my_conn = dbconnect('tennis_club.db')
         c = my_conn.cursor()
 
-        newPlayer = (rank, name, surname, wins, loses, today_string)
+        new_player = (rank, name, surname, wins, loses, today_string)
         
         # Εισαγωγή στην κατάταξη είτε η λίστα έχει παίκτες, 
         # είτε δεν έχει και ο χρήστης διάλεξε θέση 1
-        c.execute("INSERT INTO ranking VALUES {0};".format(newPlayer)) 
+        c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?);", new_player) 
         msg.showinfo(
             master=main_window, 
             parent=window, 
@@ -329,7 +336,7 @@ def delete_player(index, window):
     """
     
     # Έλεγχος αν η θέση περιέχει άτομο και ενημέρωση με μήνυμα σφάλματος
-    if empty_check(index): 
+    if is_position_empty(index): 
         msg.showerror(
             master=main_window, 
             parent=window,
@@ -340,7 +347,7 @@ def delete_player(index, window):
         my_conn = dbconnect('tennis_club.db')
         c = my_conn.cursor()
         # Λήψη δεδομένων προς διαγραφή παίκτη
-        playerDBData = c.execute("SELECT * FROM ranking WHERE Position = {0};".format(index)).fetchall()
+        playerDBData = c.execute("SELECT * FROM ranking WHERE Position = ?;", (index,)).fetchall()
         # Παράθυρο επιβεβαίωσης διαγραφής
         confirmation = msg.askyesno(
             master=main_window,
@@ -360,11 +367,11 @@ def delete_player(index, window):
                 title='Ειδοποίηση', 
                 message="Η διαγραφή ακυρώθηκε από τον χρήστη."
                 )
-            window.deletionEntry.delete(0,'end')
+            window.deletion_entry.delete(0,'end')
             return
         
-        c.execute("DELETE FROM ranking WHERE Position={0};".format(index)) #Διαγραφή παίκτη
-        c.execute("UPDATE ranking SET Position = Position - 1 WHERE Position > {0};".format(index)) #Ανανέωση λίστας
+        c.execute("DELETE FROM ranking WHERE Position=?;", (index,)) #Διαγραφή παίκτη
+        c.execute("UPDATE ranking SET Position = Position - 1 WHERE Position > ?;", (index,)) #Ανανέωση λίστας
         
         my_conn.commit()
         my_conn.close()
@@ -375,7 +382,7 @@ def delete_player(index, window):
             title='Ειδοποίηση', 
             message=f'Ο παίκτης στη θέση #{index} διαγράφηκε επιτυχώς.'
             )
-        window.deletionEntry.delete(0,'end')
+        window.deletion_entry.delete(0,'end')
 
 
 def win(window, winner_index, loser_index,today_string=today_string):
@@ -408,31 +415,33 @@ def win(window, winner_index, loser_index,today_string=today_string):
     c = my_conn.cursor()
 
     # +1 Wins σε νικητή και ανανέωση Control_Date ως ημέρα παιχνιδιού
-    c.execute("UPDATE ranking SET Wins = Wins + 1, Control_Date = '{0}' WHERE Position = {1};".format(today_string, 
-                                                                                                      winner_index))
+    c.execute(
+        "UPDATE ranking SET Wins = Wins + 1, Control_Date = ? WHERE Position = ?;", 
+        (today_string, winner_index))
     # +1 Loses σε ηττημένο και ανανέωση Control_Date ως ημέρα παιχνιδιού
-    c.execute("UPDATE ranking SET Loses = Loses + 1, Control_Date = '{0}' WHERE Position = {1};".format(today_string, 
-                                                                                                        loser_index))
+    c.execute(
+        "UPDATE ranking SET Loses = Loses + 1, Control_Date = ? WHERE Position = ?;", 
+        (today_string, loser_index))
 
     # Έλεγχος για την περίπτωση που η νίκη προκαλεί αλλαγή στην κατάταξη
     if loser_index < winner_index:
         # Προσωρινή αποθήκευση νικητή
-        sql_query = "SELECT * FROM Ranking WHERE Position={0};".format(winner_index)
-        x = c.execute(sql_query)
+        sql_query = "SELECT * FROM Ranking WHERE Position=?;"
+        x = c.execute(sql_query, (winner_index,))
 
         # Επιστρέφει λίστα, με το playerDBData[0] να είναι πλειάδα στοιχείων 
         # του νικητή        
-        winnerDBData = x.fetchall() 
+        winner_DB_data = x.fetchall() 
         # Διαγραφή νικητή από προηγούμενη θέση
-        c.execute("DELETE FROM ranking WHERE Position={0};".format(winner_index)) 
+        c.execute("DELETE FROM ranking WHERE Position=?;", (winner_index,)) 
         # Νέα πλειάδα για αλλαγή θέσης στην κατάταξη
-        entryData = (
+        entry_data = (
             loser_index, 
-            winnerDBData[0][1], 
-            winnerDBData[0][2], 
-            winnerDBData[0][3], 
-            winnerDBData[0][4], 
-            winnerDBData[0][5]
+            winner_DB_data[0][1], 
+            winner_DB_data[0][2], 
+            winner_DB_data[0][3], 
+            winner_DB_data[0][4], 
+            winner_DB_data[0][5]
             ) 
         
         my_conn.commit()
@@ -446,7 +455,7 @@ def win(window, winner_index, loser_index,today_string=today_string):
         c = my_conn.cursor()
 
         # Εισαγωγή νικητή στη θέση ηττημένου
-        c.execute("INSERT INTO ranking(Position, Name, Surname, Wins, Loses, Control_Date) VALUES {0};".format(entryData))
+        c.execute("INSERT INTO ranking(Position, Name, Surname, Wins, Loses, Control_Date) VALUES (?, ?, ?, ?, ?, ?);", entry_data)
         # Ενημέρωση χρήστη για αλλαγές στην κατάταξη
         msg.showinfo(
             master=main_window,
@@ -495,7 +504,7 @@ def update_positions(small_num, big_num):
     for p in range(big_num, small_num-1, -1): 
             # Το p είναι μετρητής τρέχουσας θέσης για το WHERE και 
             # μειώνεται σε κάθε loop, και το p+1 νέα θέση που θα λάβει
-            c.execute('UPDATE ranking SET Position = {0} WHERE Position={1}'.format(p+1, p)) 
+            c.execute('UPDATE ranking SET Position = ? WHERE Position=?', (p+1, p)) 
 
     my_conn.commit()
     my_conn.close()
@@ -518,15 +527,15 @@ def rank_decay(index,today_string=today_string):
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
 
-    x = c.execute("SELECT * FROM ranking WHERE Position={0};".format(index))
+    x = c.execute("SELECT * FROM ranking WHERE Position=?;", (index,))
     # Προσωρινή αποθήκευση στοιχείων του παίκτη 
     # που υπόκειται σε πτώση λόγω αδράνειας.
     inactive_player = x.fetchall() 
     # Διαγραφή του παίκτη
-    c.execute("DELETE FROM ranking WHERE Position={0};".format(index)) 
+    c.execute("DELETE FROM ranking WHERE Position=?;", (index,)) 
     # Μετακίνηση του κάτω παίκτη στην πλέον κενή θέση 
     # του παίκτη που υπέστη πτώση λόγω αδράνειας
-    c.execute("UPDATE ranking SET Position = {0} WHERE Position={1};".format(index,index+1)) 
+    c.execute("UPDATE ranking SET Position = ? WHERE Position=?;", (index,index+1)) 
     # Η μεταβλητή entry λαμβάνει τα στοιχεία του παίκτη που υπέστη
     # πτώση λόγω αδράνειας, με την θέση +1 από ό,τι ήταν, και ημερομηνία
     # τελευταίας δραστηριότητας τη σημερινή, για να μην ξαναϋποστεί
@@ -540,13 +549,13 @@ def rank_decay(index,today_string=today_string):
         today_string
         )
     # Εισαγωγή παίκτη που έπεσε στην πλέον κενή θέση του από κάτω παικτή
-    c.execute("INSERT INTO ranking VALUES {0};".format(entry)) 
+    c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?);", entry) 
 
     my_conn.commit()
     my_conn.close()
 
 
-def empty_check(index):
+def is_position_empty(index):
     """
     Βοηθητική συνάρτηση που ελέγχει αν ο πίνακας έχει παίκτη στη θέση που 
     ελέγχεται.
@@ -561,10 +570,10 @@ def empty_check(index):
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
     
-    c.execute("SELECT Position FROM ranking WHERE Position={0};".format(index))
+    c.execute("SELECT Position FROM ranking WHERE Position=?;", (index,))
     # Πλειάδα με νούμερο για θέση ή κενή αν δεν υπάρχει παίκτης
-    empty_check = c.fetchall() 
-    flag = len(empty_check) == 0
+    is_position_empty = c.fetchall() 
+    flag = len(is_position_empty) == 0
     
     my_conn.close()
     return flag
@@ -587,7 +596,7 @@ def check_ranking_for_decay(today=today):
     cursor = conn.cursor()
 
     # Λίστα με παίκτες που θα υποστούν πτώση λόγω αδράνειας
-    decaylist = [] 
+    decay_list = [] 
     cursor.execute("SELECT Position, Control_Date FROM ranking;")
     ranking = cursor.fetchall()
     
@@ -601,7 +610,7 @@ def check_ranking_for_decay(today=today):
             # Έλεγχος για την περίπτωση που ο παίκτης είναι τελευταίος και δεν
             # πέφτει περαιτέρω θέση
             if ranking[-1][0] == index: 
-                cursor.execute("SELECT Name, Surname FROM ranking WHERE Position={0};".format(index))
+                cursor.execute("SELECT Name, Surname FROM ranking WHERE Position=?;", (index,))
                 last_player = cursor.fetchone()
                 # Μήνυμα ειδοποίησης χρήστη πως ο παίκτης δεν πέφτει περαιτέρω
                 msg.showinfo(
@@ -612,17 +621,17 @@ def check_ranking_for_decay(today=today):
                         last_player[1]
                         )
                     )
-                cursor.execute("UPDATE ranking SET Control_Date='{0}' WHERE Position={1};".format(today_string, index))
+                cursor.execute("UPDATE ranking SET Control_Date=? WHERE Position=?;", (today_string, index))
                 break
             # Προστίθεται στη λίστα, η αλλαγή δεν γίνεται εδώ γιατί οδηγεί σε logical error του περάσματος for
-            decaylist.append(index) 
+            decay_list.append(index) 
     
     conn.commit()
     conn.close()    
     
     # Έλεγχος αν η λίστα είναι κενή
-    if decaylist: 
-        decay_positions = ','.join([str(single_decay_position) for single_decay_position in decaylist])
+    if decay_list: 
+        decay_positions = ','.join([str(single_decay_position) for single_decay_position in decay_list])
         decay_message = ''.join(['Οι παίκτες στις θέσεις ', decay_positions, ' έπεσαν μία θέση λόγω αδράνειας και η κατάταξη ανανεώθηκε.'])
         msg.showinfo(
             master=main_window, 
@@ -630,7 +639,7 @@ def check_ranking_for_decay(today=today):
             message=decay_message
             )
         # Αντίστροφο πέρασμα της λίστας για αποφυγή λαθών από την αλλαγή θέσης
-        for i in decaylist[::-1]: 
+        for i in decay_list[::-1]: 
             rank_decay(i)            
     
     # Η λίστα αδρανών παικτών είναι κενή
@@ -642,8 +651,7 @@ def check_ranking_for_decay(today=today):
             )
 
 
-
-def initializeBTNpushed():
+def on_initialize_click():
     """
     Συνάρτηση κουμπιού Αρχικοποίησης Κατάταξης. Ελέγχει αν υπάρχει ήδη κατάταξη
     και ενημερώνει τον χρήστη για αδυναμία αρχικοποίησης αν υπάρχει.
@@ -651,7 +659,7 @@ def initializeBTNpushed():
     χρησιμοποιηθούν για την τυχαία αρχικοποίηση κατάταξης.
     """ 
     # Έλεγχος για το αν ο πίνακας περιέχει παίκτες        
-    if not empty_check(1): 
+    if not is_position_empty(1): 
         # Αν περιέχει παίκτες, η τυχαία αρχικοποίηση δεν είναι διαθέσιμη
         # και ο χρήστης ενημερώνεται με το ανάλογο μήνυμα λάθους
         msg.showerror(
@@ -664,64 +672,64 @@ def initializeBTNpushed():
     
     
     # Παράθυρο διαλόγου αρχικοποίησης
-    dialogInitialize = tk.Toplevel(main_window)
-    dialogInitialize.title('Αρχικοποίηση λίστας')
-    dialogInitialize.geometry('400x500+700+350')
+    initialize_dialog = tk.Toplevel(main_window)
+    initialize_dialog.title('Αρχικοποίηση λίστας')
+    initialize_dialog.geometry('400x500+700+350')
     # Keybind για κλείσιμο παραθύρου με Escape
-    dialogInitialize.bind(
+    initialize_dialog.bind(
         "<Escape>", 
-        lambda event: dialogInitialize.destroy()
+        lambda event: initialize_dialog.destroy()
         )
     
     # Μεταβλητή για αποθήκευση παικτών προς αρχικοποίηση ως πεδίο του παραθύρου
-    dialogInitialize.players = []
+    initialize_dialog.players = []
     # Δυναμική μεταβλητή StringVar για προβολή εισαχθέντων 
     # παικτών καθώς αυτοί εισάγονται, ως πεδίο του παραθύρου
-    dialogInitialize.initializationList = tk.StringVar()
-    dialogInitialize.initializationList.set('Κενή Λίστα Παικτών')
+    initialize_dialog.initialization_list_label = tk.StringVar()
+    initialize_dialog.initialization_list_label.set('Κενή Λίστα Παικτών')
     # Πεδίο εισαγωγής
-    dialogInitialize.initializationEntry = tk.Entry(
-        dialogInitialize,
+    initialize_dialog.initialization_entry = tk.Entry(
+        initialize_dialog,
         justify='center', 
         font='Times 16',
         selectborderwidth=3
         )
-    dialogInitialize.initializationEntry.pack(pady=10)
-    dialogInitialize.initializationEntry.focus_set()
+    initialize_dialog.initialization_entry.pack(pady=10)
+    initialize_dialog.initialization_entry.focus_set()
     # Keybind για καταχώρηση παίκτη στη λίστα με Enter
-    dialogInitialize.initializationEntry.bind(
+    initialize_dialog.initialization_entry.bind(
         "<Return>", 
-        lambda event: dialogInitialize_AddPlayerBTNPushed(dialogInitialize)
+        lambda event: on_initialize_add_player_click(initialize_dialog)
         )
     # Κουμπί καταχώρησης παίκτη στη λίστα
     tk.Button(
-        dialogInitialize, 
+        initialize_dialog, 
         text="Καταχώρηση Παίκτη", 
         font='Times 16', 
-        command = lambda: dialogInitialize_AddPlayerBTNPushed(dialogInitialize)
+        command = lambda: on_initialize_add_player_click(initialize_dialog)
         ).pack(pady=5)
     # Κουμπί τέλους καταχωρήσεων και αρχικοποίησης κατάταξης
     tk.Button(
-        dialogInitialize,
+        initialize_dialog,
         text="Τέλος Καταχωρήσεων",
         font = 'Times 16', 
-        command = lambda: dialogInitialize_EntryEndBTNPushed(dialogInitialize)
+        command = lambda: on_finalize_initialization_click(initialize_dialog)
         ).pack(pady=5)
     ttk.Separator(
-        dialogInitialize,
+        initialize_dialog,
         orient='horizontal'
         ).pack(fill='x',pady=15)
     # Δυναμικό Label που αλλάζει με τις καταχωρήσεις
     tk.Label(
-        dialogInitialize, 
-        textvariable = dialogInitialize.initializationList,
+        initialize_dialog, 
+        textvariable = initialize_dialog.initialization_list_label,
         font = 'Times 16',
         justify='center'
         ).pack()     
-    dialogInitialize.mainloop()
+    initialize_dialog.mainloop()
     
 
-def dialogInitialize_AddPlayerBTNPushed(window):
+def on_initialize_add_player_click(window):
     """
     Συνάρτηση κουμπιού καταχώρησης παίκτη στο παράθυρο διαλόγου αρχικοποίησης.
     Ελέγχει το όνομα που εισήχθη, ενημερώνει σε περίπτωση λάθους, ανανεώνει 
@@ -734,8 +742,8 @@ def dialogInitialize_AddPlayerBTNPushed(window):
     Returns:
         None.
     """
-    name = window.initializationEntry.get()
-    window.initializationEntry.delete(0,'end')
+    name = window.initialization_entry.get()
+    window.initialization_entry.delete(0,'end')
     player = name.split(sep=' ')
     
     # Περίπτωση που εισαχθούν πάνω απο 1 κενά
@@ -751,17 +759,18 @@ def dialogInitialize_AddPlayerBTNPushed(window):
     window.players.append(player)
     # Ελέγχει αν το δυναμικό Label έδειχνε κενή λίστα και απαιτεί πρώτη
     # μορφοποίηση κι όχι απλά προσθήκη παίκτη σε αυτήν
-    if window.initializationList.get() == 'Κενή Λίστα Παικτών':
-        window.initializationList.set("Λίστα Παικτών\n")
+    if window.initialization_list_label.get() == 'Κενή Λίστα Παικτών':
+        window.initialization_list_label.set("Λίστα Παικτών\n")
     # Παίρνει τα δεδομένα που είχε το δυναμικό Label 
     # για να προσθέσει το νέο δεδομένο
-    string = '\n'.join([window.initializationList.get(),name])
+    string = '\n'.join([window.initialization_list_label.get(),name])
     # Προσθήκη νέου παίκτη
-    window.initializationList.set(string)
-    window.initializationEntry.focus_set()
+    window.initialization_list_label.set(string)
+    window.initialization_entry.focus_set()
     return
 
-def dialogInitialize_EntryEndBTNPushed(window):
+
+def on_finalize_initialization_click(window):
     """
     Συνάρτηση κουμπιού τέλους καταχωρήσεων στο παράθυρο διαλόγου αρχικοποίησης.
     Ελέγχει αν έχει εισαχθεί παίκτης στη λίστα. Αν δεν έχει εισαχθεί έστω ένας, 
@@ -791,7 +800,8 @@ def dialogInitialize_EntryEndBTNPushed(window):
             )
         return
 
-def addPlayerBTNpushed():
+
+def on_add_player():
     """
     Συνάρτηση κουμπιού προσθήκης παίκτης στο αρχικό παράθυρο. Ρωτάει τον χρήστη
     αν ο παίκτης θα εισαχθεί στο τέλος της κατάταξης ή σε συγκεκριμένη θέση,
@@ -800,11 +810,11 @@ def addPlayerBTNpushed():
     
    
     # Απάντηση χρήστη περί εισαγωγής παίκτη σε συγκεκριμένη θέση.
-    answerAddition = msg.askyesnocancel(
+    position_entry_answer = msg.askyesnocancel(
         title='Προσθήκη Παίκτη',
         message='''Θέλετε να εισάγετε τον παίκτη σε συγκεκριμένη θέση;'''
         )
-    if answerAddition == None:
+    if position_entry_answer == None:
         msg.showinfo(
             master=main_window, 
             title='Ειδοποίηση', 
@@ -813,49 +823,49 @@ def addPlayerBTNpushed():
         return
             
     # Παράθυρο διαλόγου εισαγωγής ονοματεπωνύμου παίκτη
-    nameEntryWindow = tk.Toplevel(main_window)
-    nameEntryWindow.geometry("550x150+650+350")
-    nameEntryWindow.title('Προσθήκη Παίκτη')
-    nameEntryWindow.bind(
+    name_entry_dialog = tk.Toplevel(main_window)
+    name_entry_dialog.geometry("550x150+650+350")
+    name_entry_dialog.title('Προσθήκη Παίκτη')
+    name_entry_dialog.bind(
         "<Escape>", 
-        lambda event: nameEntryWindow.destroy()
+        lambda event: name_entry_dialog.destroy()
         )
     # Ορίζεται ως πεδίο του αντικειμένου Top Level για να περαστεί 
     # στις συναρτήσεις που την χρησιμοποιούν
-    nameEntryWindow.answerAddition = answerAddition
+    name_entry_dialog.position_entry_answer = position_entry_answer
     tk.Label(
-        nameEntryWindow, 
-        font=defaultFont, 
+        name_entry_dialog, 
+        font=default_font, 
         text = "Δώστε όνομα και επίθετο παίκτη που θέλετε να εισάγετε: "
         ).pack(pady=5)
     # Πεδίο εισαγωγής
-    nameEntryWindow.nameEntered = tk.Entry(
-        nameEntryWindow, 
-        font=defaultFont, 
+    name_entry_dialog.name_entry = tk.Entry(
+        name_entry_dialog, 
+        font=default_font, 
         justify='center'
         )
-    nameEntryWindow.nameEntered.pack(pady=5)
-    nameEntryWindow.nameEntered.focus_set()
-    nameEntryWindow.nameEntered.bind(
+    name_entry_dialog.name_entry.pack(pady=5)
+    name_entry_dialog.name_entry.focus_set()
+    name_entry_dialog.name_entry.bind(
         "<Return>", 
-        lambda event: addPlayerDialog_nameEntryBTNpushed(nameEntryWindow)
+        lambda event: on_new_player_name_submit(name_entry_dialog)
         )
     # Κουμπί εισαγωγής ονοματεπωνύμου παίκτη
     tk.Button(
-        nameEntryWindow, 
+        name_entry_dialog, 
         text='Προσθήκη', 
-        font=defaultFont, 
-        command= lambda: addPlayerDialog_nameEntryBTNpushed(nameEntryWindow)
+        font=default_font, 
+        command= lambda: on_new_player_name_submit(name_entry_dialog)
         ).pack(pady=5)
     
 
-def addPlayerDialog_nameEntryBTNpushed(window):
+def on_new_player_name_submit(window):
     """
     Συνάρτηση για το κουμπί διαλόγου εισαγωγής παίκτη. Ελέγχει αν το όνομα και το
     επίθετο δόθηκαν σε αποδεκτή μορφή και ενημερώνει τον χρήστη. 
     
     Αν ο χρήστης απάντησε πως δε θέλει να βάλει τον παίκτη σε συγκεκριμένη θέση,
-    βάζει τον παίκτη στην τελευταία θέση της ΒΔ με κλήση της insert_bottom().
+    βάζει τον παίκτη στην τελευταία θέση της ΒΔ με κλήση της insert_player_at_end().
     
     Αν ο χρήστης απάντησε πως θέλει να βάλει τον παίκτη σε συγκεκριμένη θέση, 
     ζητάει τη θέση με νέο παράθυρο διαλόγου.
@@ -867,12 +877,12 @@ def addPlayerDialog_nameEntryBTNpushed(window):
     Returns: 
         None.
     """
-    playerNameEntered = window.nameEntered.get()
-    window.nameEntered.delete(0,'end')
+    player_name_entry = window.name_entry.get()
+    window.name_entry.delete(0,'end')
     
-    playerAdded = playerNameEntered.split(sep=' ')
+    player_name = player_name_entry.split(sep=' ')
     # Έλεγχος σωστής εισαγωγής ονοματεπωνύμου
-    if len(playerAdded) != 2: 
+    if len(player_name) != 2: 
         # Ενημέρωση χρήστη με κατάλληλο μήνυμα
         msg.showerror(
             master=main_window, 
@@ -881,65 +891,66 @@ def addPlayerDialog_nameEntryBTNpushed(window):
             message="Παρακαλώ εισάγετε όνομα και επίθετο χωρισμένα με ένα κενό."
             )
         return
-    name, surname = playerAdded[0], playerAdded[1]
+    name, surname = player_name[0], player_name[1]
     # Αν ο χρήστης απάντησε πως δε θέλει να βάλει σε συγκεκριμένη θέση
     # τον παίκτη, μπαίνει στην τελευταία θέση
-    if window.answerAddition == False:
-        insert_bottom(window, name, surname)
+    if window.position_entry_answer == False:
+        insert_player_at_end(window, name, surname)
         window.destroy()
     # Αν ο χρήστης απάντησε πως θέλει να βάλει σε συγκεκριμένη θέση τον παίκτη
-    elif window.answerAddition == True:
+    elif window.position_entry_answer == True:
         # Δημιουργία παραθύρου διαλόγου
-        positionEntryWindow = tk.Toplevel(window)
-        positionEntryWindow.geometry("600x150+625+450")
-        positionEntryWindow.title("Προσθήκη Παίκτη σε Θέση")
-        positionEntryWindow.bind(
+        position_entry_dialog = tk.Toplevel(window)
+        position_entry_dialog.geometry("600x150+625+450")
+        position_entry_dialog.title("Προσθήκη Παίκτη σε Θέση")
+        position_entry_dialog.bind(
             "<Escape>", 
-            lambda event: positionEntryWindow.destroy()
+            lambda event: position_entry_dialog.destroy()
             )
         
         tk.Label(
-            positionEntryWindow, 
-            font=defaultFont, 
+            position_entry_dialog, 
+            font=default_font, 
             text='Δώστε τη θέση κατάταξης του παίκτη που θέλετε να προσθέσετε: '
             ).pack(pady=5)
         # Πεδίο εισαγωγής
         
-        positionEntryWindow.positionEntry = tk.Entry(
-            positionEntryWindow, 
-            font=defaultFont, 
+        position_entry_dialog.position_entry = tk.Entry(
+            position_entry_dialog, 
+            font=default_font, 
             justify='center'
             )
-        positionEntryWindow.positionEntry.pack(pady=5)
-        positionEntryWindow.positionEntry.focus_set()
-        positionEntryWindow.positionEntry.bind(
+        position_entry_dialog.position_entry.pack(pady=5)
+        position_entry_dialog.position_entry.focus_set()
+        position_entry_dialog.position_entry.bind(
             "<Return>", 
-            lambda event: addPlayerDialog_positionEntryBTNpushed(
+            lambda event: on_new_player_position_submit(
                 name, 
                 surname, 
-                positionEntryWindow
+                position_entry_dialog
                 )
             )
         # Κουμπί καταχώρησης θέσης εισαγωγής παίκτη προς προσθήκη
         tk.Button(
-            positionEntryWindow, 
-            font=defaultFont, 
+            position_entry_dialog, 
+            font=default_font, 
             text='OK',
-            command= lambda: addPlayerDialog_positionEntryBTNpushed(
+            command= lambda: on_new_player_position_submit(
                 name,
                 surname,
-                positionEntryWindow
+                position_entry_dialog
                 )
             ).pack(pady=5)
         
     return
 
-def addPlayerDialog_positionEntryBTNpushed(name, surname, window):
+
+def on_new_player_position_submit(name, surname, window):
     """
     Συνάρτηση κουμπιού εισαγωγής θέσης για το παράθυρο διαλόγου προσθήκης παίκτη
     σε συγκεκριμένη θέση.
     Ελέγχει αν η εισαγωγή είναι σωστή και ανανεώνει τη ΒΔ καλώντας την 
-    insert_place() ή ενημερώνει τον χρήστη με μήνυμα σφάλματος.
+    insert_player_at_position() ή ενημερώνει τον χρήστη με μήνυμα σφάλματος.
     
     
     Args:
@@ -953,11 +964,11 @@ def addPlayerDialog_positionEntryBTNpushed(name, surname, window):
     
     # Try block για εισαγωγή μη ακεραίου αριθμού.
     # Ο αμυντικός προγραμματισμός για εισαγωγή αποδεκτής τιμής 
-    # γίνεται μέσω της insert_place
+    # γίνεται μέσω της insert_player_at_position
     try:
-        positionEntered = int(window.positionEntry.get())
-        window.positionEntry.delete(0,'end')
-        insert_place(window, positionEntered, name, surname)
+        player_position = int(window.position_entry.get())
+        window.position_entry.delete(0,'end')
+        insert_player_at_position(window, player_position, name, surname)
         window.destroy()
     except ValueError:
         # Ενημέρωση χρήστη για μη αποδεκτή εισαγωγή θέση (όχι ακέραιος)
@@ -970,7 +981,7 @@ def addPlayerDialog_positionEntryBTNpushed(name, surname, window):
     return
     
 
-def delPlayerBTNpushed():
+def on_del_player():
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για διαγραφή παίκτη.
     Ελέγχει αν η κατάταξη περιέχει έστω έναν παίκτη και δημιουργεί παράθυρο 
@@ -978,7 +989,7 @@ def delPlayerBTNpushed():
     τον χρήστη με το ανάλογο μήνυμα σφάλματος.
     """
     # Ελέγχει αν η κατάταξη περιέχει έστω έναν παίκτη
-    if empty_check(1):
+    if is_position_empty(1):
         # Ειδοποίηση χρήστη με το κατάλληλο μήνυμα
         msg.showerror(
             master=main_window, 
@@ -988,50 +999,50 @@ def delPlayerBTNpushed():
     # Η κατάταξη περιέχει παίκτες
     else:
         # Δημιουργία παραθύρου διαλόγου
-        deletionDialog = tk.Toplevel(main_window)
-        deletionDialog.geometry("550x200+650+450")
-        deletionDialog.title('Διαγραφή Παίκτη')
-        deletionDialog.bind(
+        deletion_dialog = tk.Toplevel(main_window)
+        deletion_dialog.geometry("550x200+650+450")
+        deletion_dialog.title('Διαγραφή Παίκτη')
+        deletion_dialog.bind(
             "<Escape>", 
-            lambda event: deletionDialog.destroy()
+            lambda event: deletion_dialog.destroy()
             )
         tk.Label(
-            deletionDialog, 
+            deletion_dialog, 
             text='Δώστε τη θέση κατάταξης του παίκτη που θέλετε να διαγράψετε: ', 
             font = 'Times 14'
             ).pack(pady=20)
         # Πεδίο εισαγωγής
         
-        deletionDialog.deletionEntry = tk.Entry(
-            deletionDialog,
+        deletion_dialog.deletion_entry = tk.Entry(
+            deletion_dialog,
             justify = 'center', 
-            font=defaultFont
+            font=default_font
             )
-        deletionDialog.deletionEntry.pack(pady=5)
-        deletionDialog.deletionEntry.focus_set()
-        deletionDialog.deletionEntry.bind(
+        deletion_dialog.deletion_entry.pack(pady=5)
+        deletion_dialog.deletion_entry.focus_set()
+        deletion_dialog.deletion_entry.bind(
             "<Return>", 
-            lambda event: deletionDialog_deleteBTNPushed(deletionDialog)
+            lambda event: on_dialog_delete_click(deletion_dialog)
             )
         # Κουμπί διαγραφής
         tk.Button(
-            deletionDialog, 
+            deletion_dialog, 
             text='Διαγραφή', 
             font='Times 16', 
-            command= lambda: deletionDialog_deleteBTNPushed(deletionDialog)
+            command= lambda: on_dialog_delete_click(deletion_dialog)
             ).pack(side='left',padx=60)
         # Κουμπί ακύρωσης διαγραφής
         tk.Button(
-            deletionDialog, 
+            deletion_dialog, 
             text='Ακύρωση', 
             font='Times 16', 
-            command=deletionDialog.destroy
+            command=deletion_dialog.destroy
             ).pack(side='right',padx=60)
         
-        deletionDialog.mainloop()
+        deletion_dialog.mainloop()
         
 
-def deletionDialog_deleteBTNPushed(window):
+def on_dialog_delete_click(window):
     """
     Συνάρτηση για το κουμπί διαγραφής του παραθύρου διαλόγου διαγραφής παίκτη.
     Ελέγχει ότι ο χρήστης εισάγει ακέραιο αριθμό για τη θέση κατάταξης ή 
@@ -1048,7 +1059,7 @@ def deletionDialog_deleteBTNPushed(window):
     # Ελέγχει πως ο χρήστης εισήγαγε ακέραιο αριθμό
     # Ο έλεγχος αποδεκτής τιμής γίνεται από την delete_player()
     try:
-        index = int(window.deletionEntry.get())
+        index = int(window.deletion_entry.get())
         delete_player(index, window)
     except ValueError:
         # Ειδοποίηση χρήστη για λάθος εισαγωγή θέσης
@@ -1058,10 +1069,11 @@ def deletionDialog_deleteBTNPushed(window):
             title='Ειδοποίηση', 
             message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης."
             )
-        window.deletionEntry.delete(0,'end')
+        window.deletion_entry.delete(0,'end')
     return
 
-def challengeBTNpushed():
+
+def on_challenge_click():
     """
     Συνάρτηση κουμπιού καταγραφής αγώνα του κυρίου παραθύρου. 
     
@@ -1072,13 +1084,13 @@ def challengeBTNpushed():
     την πρόκληση.
     """
     # Έλεγχος αν η κατάταξη περιέχει έναν ή κανέναν παίκτη και δεν ορίζεται αγώνας
-    if empty_check(1):
+    if is_position_empty(1):
         msg.showerror(
             master=main_window, 
             title='Ειδοποίηση', 
             message="Η κατάταξη δεν περιέχει παίκτες!"
             )
-    elif empty_check(2):
+    elif is_position_empty(2):
         msg.showerror(
             master=main_window, 
             title='Ειδοποίηση', 
@@ -1087,48 +1099,48 @@ def challengeBTNpushed():
     # Περιέχει πάνω από 1 παίκτη
     else:
         # Δημιουργία παραθύρου διαλόγου για την πρόκληση
-        challengeDialog = tk.Toplevel(main_window)
-        challengeDialog.geometry("650x200+650+450")
-        challengeDialog.title("Καταγραφη Πρόκλησης")
-        challengeDialog.bind(
+        challenge_dialog = tk.Toplevel(main_window)
+        challenge_dialog.geometry("650x200+650+450")
+        challenge_dialog.title("Καταγραφη Πρόκλησης")
+        challenge_dialog.bind(
             "<Escape>", 
-            lambda event: challengeDialog.destroy()
+            lambda event: challenge_dialog.destroy()
             )
         # Τίθεται ως δυναμικό Label για να αλλάζει 
         # μετά την καταχώρηση του πρώτου παίκτη
-        challengeDialog.challengeLabel = tk.StringVar()
-        challengeDialog.challengeLabel.set('Δώστε τη θέση κατάταξης του παίκτη που προκαλεί: ')
+        challenge_dialog.challenge_label = tk.StringVar()
+        challenge_dialog.challenge_label.set('Δώστε τη θέση κατάταξης του παίκτη που προκαλεί: ')
         tk.Label(
-            master=challengeDialog, 
-            textvariable= challengeDialog.challengeLabel, 
-            font=defaultFont
+            master=challenge_dialog, 
+            textvariable= challenge_dialog.challenge_label, 
+            font=default_font
             ).pack(pady = 10)
         # Πεδίο εισαγωγής
-        challengeDialog.challengeEntry = tk.Entry(
-            master=challengeDialog, 
+        challenge_dialog.challenge_entry = tk.Entry(
+            master=challenge_dialog, 
             justify='center', 
-            font=defaultFont
+            font=default_font
             )
-        challengeDialog.challengeEntry.pack(pady = 10)
-        challengeDialog.challengeEntry.focus_set()
-        challengeDialog.challengeEntry.bind(
+        challenge_dialog.challenge_entry.pack(pady = 10)
+        challenge_dialog.challenge_entry.focus_set()
+        challenge_dialog.challenge_entry.bind(
             "<Return>", 
-            lambda event: challengeDialog_challengeBTNPushed(challengeDialog)
+            lambda event: on_dialog_challenge_click(challenge_dialog)
             )
         # Μεταβλητή που αποθηκεύει τις θέσεις των παικτών
         # που εμπλέκονται στην πρόκληση ως πεδίου του Top Level object
-        challengeDialog.players_in_challenge = []
+        challenge_dialog.players_in_challenge = []
         # Κουμπί καταχώρησης θέσης παίκτη που εμπλέκεται στην πρόκληση
         tk.Button(
-            master=challengeDialog, 
+            master=challenge_dialog, 
             text='OK', 
-            font = defaultFont, 
-            command= lambda: challengeDialog_challengeBTNPushed(challengeDialog)
+            font = default_font, 
+            command= lambda: on_dialog_challenge_click(challenge_dialog)
             ).pack(pady = 10)
-        challengeDialog.mainloop()
+        challenge_dialog.mainloop()
 
 
-def challengeDialog_challengeBTNPushed(window):
+def on_dialog_challenge_click(window):
     """
     Συνάρτηση κουμπιού καταχώρησης θέσης παίκτη που συμμετέχει στην πρόκληση. 
     
@@ -1153,17 +1165,17 @@ def challengeDialog_challengeBTNPushed(window):
     try:
         # Ελέγχει πως η θέση που εισήχθη περιέχει παίκτη ή ενημερώνει με
         # το ανάλογο μήνυμα σφάλματος
-        if empty_check(int(window.challengeEntry.get())):
+        if is_position_empty(int(window.challenge_entry.get())):
             msg.showerror(
                 master=main_window, 
                 parent=window, 
                 title='Ειδοποίηση', 
-                message=f"Δεν υπάρχει παίκτης στη θέση #{window.challengeEntry.get()}"
+                message=f"Δεν υπάρχει παίκτης στη θέση #{window.challenge_entry.get()}"
                 )
             return
         # Προσθήκη εισαχθείσας θέσεις στη λίστα παικτών που εμπλέκονται
-        window.players_in_challenge.append(int(window.challengeEntry.get()))
-        window.challengeEntry.delete(0,'end')
+        window.players_in_challenge.append(int(window.challenge_entry.get()))
+        window.challenge_entry.delete(0,'end')
     except ValueError:
         # Ενημέρωση χρήστη για εισαγωγή μη ακεραίου
         # Ο έλεγχος των τιμών της πρόκλησης γίνεται από το try block και
@@ -1177,7 +1189,7 @@ def challengeDialog_challengeBTNPushed(window):
         return
     # Εάν έχει λάβει μόνο έναν παίκτη, ενημερώνει το δυναμικό Label
     if len(window.players_in_challenge) == 1:
-        window.challengeLabel.set('Δώστε τη θέση κατάταξης του παίκτη που δέχεται την πρόκληση:')
+        window.challenge_label.set('Δώστε τη θέση κατάταξης του παίκτη που δέχεται την πρόκληση:')
     # Εάν έχει λάβει 2 παίκτες, καλεί την challenge()
     elif len(window.players_in_challenge) == 2:
         challenge(
@@ -1190,7 +1202,7 @@ def challengeDialog_challengeBTNPushed(window):
     return
 
 
-def inactivePlayerCheckBTNpushed():
+def on_inactive_check_click():
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για έλεγχο για αδρανείς παίκτες.
     Ελέγχει αν η κατάταξη περιέχει παίκτες και καλεί την 
@@ -1200,7 +1212,7 @@ def inactivePlayerCheckBTNpushed():
     αδρανείς παίκτες.
     """
     # Ελέγχει πως η κατάταξη δεν είναι κενή ή ειδοποιεί με το κατάλληλο μήνυμα
-    if empty_check(1):
+    if is_position_empty(1):
         msg.showerror(
             master=main_window, 
             title='Ειδοποίηση', 
@@ -1209,7 +1221,8 @@ def inactivePlayerCheckBTNpushed():
     else:
         check_ranking_for_decay()
 
-def showRankingBTNpushed():
+
+def on_show_ranking_click():
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για εμφάνιση της κατάταξης.
     
@@ -1218,7 +1231,7 @@ def showRankingBTNpushed():
     με μήνυμα σφάλματος περί άδειας κατάταξης.
     """
     # Ελέγχει πως η κατάταξη δεν είναι κενή ή ειδοποιεί με το κατάλληλο μήνυμα
-    if empty_check(1):
+    if is_position_empty(1):
         msg.showerror(
             master=main_window, 
             title='Ειδοποίηση', 
@@ -1226,18 +1239,28 @@ def showRankingBTNpushed():
             )
     else:
         # Δημιουργεί παράθυρο με tree για προβολή κατάταξης
-        ranking_table = tk.Toplevel(main_window)
-        ranking_table.title("Πίνακας Κατάταξης")
-        ranking_table.geometry("1000x800+350+0")
-        ranking_table.bind(
+        ranking_window = tk.Toplevel(main_window)
+        ranking_window.title("Πίνακας Κατάταξης")
+        ranking_window.geometry("1000x800+350+0")
+        ranking_window.bind(
             "<Escape>", 
-            lambda event: ranking_table.destroy()
+            lambda event: ranking_window.destroy()
             )
-        style = ttk.Style()
-        style.configure("mystyle.Treeview",font=('Times',16),rowheight=30)
+        tree_style = ttk.Style()
+        tree_style.configure(
+            "mystyle.Treeview",
+            font=('Times',16),
+            rowheight=30
+            )
+        tree_style.configure(
+            "mystyle.Treeview.Heading",  
+            font=('Times', 16), 
+            rowheight=30
+            )
+        
         # Δημιουργία Treeview με τις απαιτούμενες στύλες και μορφοποιήσεις
         tree = ttk.Treeview(
-            ranking_table, 
+            ranking_window, 
             style="mystyle.Treeview", 
             columns=(
                 'Θέση', 
@@ -1246,13 +1269,39 @@ def showRankingBTNpushed():
                 'Νίκες', 
                 'Ήττες'
                 ),
-            show='headings'
+            show='tree headings'
             )
-        tree.column('Θέση', width=45)
-        tree.column('Όνομα', width=150)
-        tree.column('Επίθετο', width=225)
-        tree.column('Νίκες', width=45)
-        tree.column('Ήττες', width=45)
+        tree.column(
+            '#0', 
+            anchor = 'center',
+            width = 45
+            )
+        tree.column(
+            'Θέση', 
+            anchor = 'center',
+            width=45
+            )
+        tree.column(
+            'Όνομα',
+            anchor = 'center',
+            width=150
+            )
+        tree.column(
+            'Επίθετο',
+            anchor = 'center',
+            width=225
+            )
+        tree.column(
+            'Νίκες', 
+            anchor = 'center',
+            width=45
+            )
+        tree.column(
+            'Ήττες', 
+            anchor = 'center',
+            width=45
+            )
+        tree.heading('#0', text = 'Επεξεργασία')
         tree.heading('Θέση', text = 'Θέση')
         tree.heading('Όνομα', text = 'Όνομα')
         tree.heading('Επίθετο', text = 'Επίθετο')
@@ -1261,11 +1310,99 @@ def showRankingBTNpushed():
         # Καλεί την fill_tree() να γεμίσει το tree με τα δεδομένα της ΒΔ
         fill_tree(tree)
         tree.pack(fill='both',expand=1)
-        ranking_table.focus_set()
-        ranking_table.mainloop()
+        # Εντοπίζει clicks στο παράθυρο
+        tree.bind(
+            "<Button-1>", 
+            lambda event: on_tree_click(event, tree)
+            )
+        ranking_window.focus_set()
+        ranking_window.mainloop()
         return
+ 
+def on_tree_click(event, tree):
+    """
+    Συνάρτηση που λαμβάνει τα events clicks στο παράθυρο και ελέγχει αν ήταν
+    στο κουμπί επεξεργασίας. Αν ήταν όντως, καλεί την on_edit_click().
     
-def exitBTNpushed():
+    
+    Args:
+        event (Event Object): Αντικείμενο με τα στοιχεία του event.
+        tree (Treeview Object): Το Tree του αρχικού παραθύρου.
+        
+    Returns:
+        None.
+    """
+    region = tree.identify("region", event.x, event.y)
+    col = tree.identify_column(event.x)
+    row = tree.identify_row(event.y)
+    if col == "#0" and region == 'tree' and row:
+        on_edit_click(row, tree)
+            
+def on_edit_click(item_id, tree):
+    """
+    Συνάρτηση απόκρισης στο click στην στήλη επεξεργασία. Ανοίγει παράθυρο
+    διαλόγου για επεξεργασία των πεδίων.
+    
+    
+    Args:
+        item_id (event.y object): Παράμετρος που καθορίζει ποια γραμμή επιλέχθηκε.
+        tree (Treeview object): Ο πίνακας του παραθύρου.
+        
+    Returns:
+        None.
+    """
+    edit_details_dialog = tk.Toplevel(main_window)
+    edit_details_dialog.title("Επεξεργασία")
+    edit_details_dialog.geometry('350x450+650+150')
+    edit_details_dialog.bind(
+        "<Escape>", 
+        edit_details_dialog.destroy
+        )
+    values = tree.item(item_id, 'values')
+    columns = [
+        'Θέση',
+        'Όνομα', 
+        'Επώνυμο',
+        'Νίκες',
+        'Ήττες'
+        ]
+    col_index = 0
+    entry_fields = []
+    for value in values:
+        tk.Label(
+            edit_details_dialog,
+            font = default_font,
+            text = columns[col_index],
+            ).pack(pady=5)
+        entry = tk.Entry(
+            edit_details_dialog,
+            font = default_font,
+            justify = 'center', 
+            )
+        entry.insert(0,value)
+        entry.pack(pady=5)
+        entry_fields.append(entry)
+        col_index += 1
+    
+
+    def on_edit_save():
+        # TODO: compare new_values to previous values and save accordingly
+        # Defensive programming necessary
+        new_values = []
+        for entry_field in entry_fields:
+            new_values.append(entry_field.get())
+        
+        edit_details_dialog.destroy()
+
+    tk.Button(
+        edit_details_dialog, 
+        font = default_font,
+        text = "Save", 
+        command = on_edit_save
+        ).pack(pady=5)
+
+    
+def on_exit_click():
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για έξοδο.
     
@@ -1273,73 +1410,12 @@ def exitBTNpushed():
     """
     main_window.destroy()
 
-
 if __name__ == '__main__':
     # Δημιουργία κύριου παραθύρου
     main_window = tk.Tk()
     main_window.geometry('600x600+650+150')
     main_window.title("Tennis Ladder App")
-    defaultFont = 'Times 16'
-    # Κουμπί αρχικοποίησης
-    initializeBTN = tk.Button(
-        main_window, 
-        text = 'Αρχικοποίηση κατάταξης', 
-        font = defaultFont, 
-        command = initializeBTNpushed, 
-        relief='groove', bd=10
-        )
-    # Κουμπί προσθήκης παίκτη
-    addPlayerBTN = tk.Button(
-        main_window, 
-        text = 'Προσθήκη παίκτη', 
-        font = defaultFont, 
-        command = addPlayerBTNpushed,
-        relief='groove', bd=10
-        )
-    # Κουμπί διαγραφής παίκτη
-    delPlayerBTN = tk.Button(
-        main_window, 
-        text = 'Διαγραφή παίκτη', 
-        font = defaultFont, 
-        command = delPlayerBTNpushed, 
-        relief='groove', bd=10
-        )
-    # Κουμπί ελέγχου και καταγραφής αγώνα
-    challengeBTN = tk.Button(
-        main_window, 
-        text = 'Έλεγχος και καταγραφή αποτελέσματος πρόκλησης', 
-        font = defaultFont, 
-        command = challengeBTNpushed, 
-        relief='groove',
-        bd=10
-        )
-    # Κουμπί ελέγχου για αδρανείς παίκτες
-    inactivePlayerCheckBTN = tk.Button(
-        main_window, 
-        text = 'Έλεγχος κατάταξης για αδρανείς παίκτες', 
-        font = defaultFont, 
-        command = inactivePlayerCheckBTNpushed,
-        relief='groove', 
-        bd=10
-        )
-    # Κουμπί εμφάνισης κατάταξης
-    showRankingBTN = tk.Button(
-        main_window, 
-        text = 'Εμφάνιση κατάταξης', 
-        font = defaultFont, 
-        command = showRankingBTNpushed, 
-        relief='groove', 
-        bd=10
-        )
-    # Κουμπί εξόδου από το πρόγραμμα
-    exitBTN = tk.Button(
-        main_window, 
-        text = 'Έξοδος',
-        font = defaultFont, 
-        command = exitBTNpushed, 
-        relief='groove', 
-        bd=10
-        )
+    default_font = 'Times 16'
     
     ttk.Separator(
         main_window,
@@ -1348,50 +1424,38 @@ if __name__ == '__main__':
             fill='x',
             pady=15
             )
-    initializeBTN.pack(
-        fill='x', 
-        padx=50, 
-        pady=10
-        )
-    addPlayerBTN.pack(
-        fill='x', 
-        padx=50, 
-        pady=10
-        )
-    delPlayerBTN.pack(
-        fill='x', 
-        padx=50,
-        pady=10
-        )
-    challengeBTN.pack(
-        fill='x', 
-        padx=50, 
-        pady=10
-        )
-    inactivePlayerCheckBTN.pack(
-        fill='x', 
-        padx=50, 
-        pady=10
-        )
-    showRankingBTN.pack(
-        fill='x', 
-        padx=50, 
-        pady=10
-        )
-    exitBTN.pack(
-        fill='x',
-        padx=50, 
-        pady=10
-        )
+    # Λίστα με τα κουμπιά
+    buttons = [
+        ('Αρχικοποίηση κατάταξης', on_initialize_click),
+        ('Προσθήκη παίκτη', on_add_player),
+        ('Διαγραφή παίκτη', on_del_player),
+        ('Έλεγχος και καταγραφή αποτελέσματος πρόκλησης', on_challenge_click),
+        ('Έλεγχος κατάταξης για αδρανείς παίκτες', on_inactive_check_click),
+        ('Εμφάνιση κατάταξης', on_show_ranking_click),
+        ('Έξοδος', on_exit_click)
+    ]
+    for label, function in buttons:
+        tk.Button(
+            main_window,
+            text = label,
+            font = default_font,
+            command = function,
+            relief = 'groove', 
+            bd = 10
+            ).pack(
+                fill = 'x',
+                padx = 50,
+                pady = 10)
     tk.Label(
         main_window, 
-        text='Made by Black Baron', 
+        text = 'Made by Black Baron', 
         font = (
             'Old English Text MT',
             12
             ),
-        justify='left'
-        ).pack(side='right')
+        justify = 'left'
+        ).pack(
+            side = 'right'
+            )
     create_table()
     main_window.mainloop()
-    
