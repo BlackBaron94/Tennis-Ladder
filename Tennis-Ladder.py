@@ -167,9 +167,7 @@ def initialization(initialization_players,today_string=today_string):
 
 def fill_tree(tree):
     """
-    Ενημερώνει το tree του UI εκχωρώντας σε αυτό τα στοιχεία όλων των παικτών 
-    (πλην Control_Date, για αυτή χρησιμοποιήστε την εσωτερική συνάρτηση 
-    print_ranking())
+    Ενημερώνει το tree του UI εκχωρώντας σε αυτό τα στοιχεία όλων των παικτών.
     
     
     Args:
@@ -178,6 +176,9 @@ def fill_tree(tree):
     Returns:
         None.
     """
+    # Διαγράφει τα δεδομένα του Treeview. 
+    # Αν δεν έχει δεδομένα, δεν κάνει κάτι.
+    tree.delete(*tree.get_children())
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
 
@@ -192,14 +193,15 @@ def fill_tree(tree):
             name,
             surname,
             wins,
-            loses))
+            loses 
+            ))
     
-    
-    
+    # Λίστα για τη διατήρηση αναφορών στην εικόνα για αποφυγή 
+    # απώλειας εικόνας λόγω garbage-collection
     tree.image_refs = []
     # Εισάγει τα δεδομένα στο tree
     for item in ranking_list:
-        tree.insert('', tk.END, text = '', image = icon, values=item)
+        tree.insert('', tk.END, text = ' ', image = icon, values=item)
         tree.image_refs.append(icon)
     
     my_conn.close()
@@ -1257,7 +1259,9 @@ def on_show_ranking_click():
             font=('Times', 16), 
             rowheight=30
             )
-        
+        tree_style.layout("mystyle.Treeview", [
+            ("mystyle.Treeview.treearea", {"sticky":"nswe"})
+            ])
         # Δημιουργία Treeview με τις απαιτούμενες στύλες και μορφοποιήσεις
         tree = ttk.Treeview(
             ranking_window, 
@@ -1267,19 +1271,20 @@ def on_show_ranking_click():
                 'Όνομα', 
                 'Επίθετο', 
                 'Νίκες', 
-                'Ήττες'
+                'Ήττες',
+                'test'
                 ),
             show='tree headings'
             )
         tree.column(
             '#0', 
             anchor = 'center',
-            width = 45
+            width = 57
             )
         tree.column(
             'Θέση', 
             anchor = 'center',
-            width=45
+            width=10
             )
         tree.column(
             'Όνομα',
@@ -1294,14 +1299,19 @@ def on_show_ranking_click():
         tree.column(
             'Νίκες', 
             anchor = 'center',
-            width=45
+            width=10
             )
         tree.column(
             'Ήττες', 
             anchor = 'center',
-            width=45
+            width=10
             )
-        tree.heading('#0', text = 'Επεξεργασία')
+        tree.column(
+            'test',
+            anchor = 'center',
+            width = 10
+            )
+        tree.heading('#0', text = 'Επεξεργασία', anchor = 'center')
         tree.heading('Θέση', text = 'Θέση')
         tree.heading('Όνομα', text = 'Όνομα')
         tree.heading('Επίθετο', text = 'Επίθετο')
@@ -1319,6 +1329,7 @@ def on_show_ranking_click():
         ranking_window.mainloop()
         return
  
+    
 def on_tree_click(event, tree):
     """
     Συνάρτηση που λαμβάνει τα events clicks στο παράθυρο και ελέγχει αν ήταν
@@ -1337,7 +1348,9 @@ def on_tree_click(event, tree):
     row = tree.identify_row(event.y)
     if col == "#0" and region == 'tree' and row:
         on_edit_click(row, tree)
-            
+    return
+
+
 def on_edit_click(item_id, tree):
     """
     Συνάρτηση απόκρισης στο click στην στήλη επεξεργασία. Ανοίγει παράθυρο
@@ -1356,9 +1369,9 @@ def on_edit_click(item_id, tree):
     edit_details_dialog.geometry('350x450+650+150')
     edit_details_dialog.bind(
         "<Escape>", 
-        edit_details_dialog.destroy
+        lambda event: edit_details_dialog.destroy()
         )
-    values = tree.item(item_id, 'values')
+    edit_details_dialog.values = tree.item(item_id, 'values')
     columns = [
         'Θέση',
         'Όνομα', 
@@ -1367,8 +1380,9 @@ def on_edit_click(item_id, tree):
         'Ήττες'
         ]
     col_index = 0
-    entry_fields = []
-    for value in values:
+    # Μεταβλητή στην οποία αποθηκεύεται αναφορά στα Entries
+    edit_details_dialog.entry_fields = []
+    for value in edit_details_dialog.values:
         tk.Label(
             edit_details_dialog,
             font = default_font,
@@ -1381,31 +1395,176 @@ def on_edit_click(item_id, tree):
             )
         entry.insert(0,value)
         entry.pack(pady=5)
-        entry_fields.append(entry)
+        edit_details_dialog.entry_fields.append(entry)
         col_index += 1
     
-
-    def on_edit_save():
-        # TODO: compare new_values to previous values and save accordingly
-        # Defensive programming necessary
-        new_values = []
-        for entry_field in entry_fields:
-            new_values.append(entry_field.get())
-        
-        edit_details_dialog.destroy()
+    edit_details_dialog.focus_set()
+    edit_details_dialog.bind(
+        "<Return>",
+        lambda event: on_edit_save(edit_details_dialog,tree)
+        )
 
     tk.Button(
         edit_details_dialog, 
         font = default_font,
-        text = "Save", 
-        command = on_edit_save
+        text = "Αποθήκευση", 
+        command = lambda: on_edit_save(edit_details_dialog,tree)
         ).pack(pady=5)
+    edit_details_dialog.mainloop()
 
+
+def on_edit_save(window, tree):
+    """
+    Συνάρτηση κουμπιού αποθήκευσης στην επεξεργασία καταχώρησης του
+    παραθύρου εμφάνισης κατάταξης.
+    Ελέγχει εισαγωγή θετικών ακεραίων για Θέση, Νίκες και ήττες και εισαγωγή 
+    χωρίς κενά για όνομα και επώνυμο.
+    
+    
+    Args:
+        window (Top Level Object): Το παράθυρο διαλόγου επεξεργασίας καταχώρησης.
+        tree (Treeview Object): Ο πίνακας κατάταξης για ανανέωσή του με νέα δεδομένα.
+    
+    Returns:
+        None.
+    """
+    
+    # Λίστα στην οποία αποθηκεύονται οι τιμές που εισήχθησαν
+    entered_values = []
+    for entry_field in window.entry_fields:
+        entered_values.append(entry_field.get())
+    
+    # Έλεγχος σωστής εισαγωγής ακεραίων για θέση, νίκες, ήττες.
+    values_index_tag = [
+        (0,'την θέση κατάταξης.'),
+        (3,'τις νίκες.'),
+        (4,'τις ήττες.')
+        ]
+    entered_rank_wins_loses = []
+    for index, tag in values_index_tag:
+        try:
+            entered_rank_wins_loses.append(int(entered_values[index]))
+            # Ελέγχει πως η τελευταία τιμή που μπήκε στη λίστα 
+            # δεν είναι αρνητική. Ο έλεγχος για μη αποδοχή μηδενικής θέσης
+            # γίνεται από την insert_player_at_position()
+            if entered_rank_wins_loses[-1] < 0:
+                raise(ValueError)
+            
+        except ValueError:
+            msg.showerror(
+                master=main_window, 
+                parent=window, 
+                title='Ειδοποίηση', 
+                message="Παρακαλώ, εισάγετε ακέραιο θετικό αριθμό για {0}".format(tag)
+                )
+            return
+    
+    # Έλεγχος πως εισάγεται μόνο μια λέξη σε Όνομα και Επώνυμο.
+    for index in range(1,3):
+        if len(entered_values[index].split(' ')) > 1:
+            if index == 1:
+                tag = 'όνομα'
+                # Αντικαθιστά τα κενά με παύλες
+                window.entry_fields[1].delete(0, 'end')
+                entered_values[index] = entered_values[index].replace(' ', '-')
+                window.entry_fields[1].insert(0, entered_values[index])
+            else:
+                tag = 'επώνυμο'
+                window.entry_fields[2].delete(0, 'end')
+                entered_values[index] = entered_values[index].replace(' ', '-')
+                window.entry_fields[2].insert(0, entered_values[index])
+
+            msg.showerror(
+                master = main_window,
+                parent = window,
+                title = 'Ειδοποίηση',
+                message = '''Παρακαλώ εισάγετε μόνο μία λέξη χωρίς κενά για το {0}.
+Αν χρειάζεται, παρακαλώ χρησιμοποιήστε παύλες.'''.format(tag)
+                )
+            return
+
+    # Απαραίτητο για μετατροπή των '01' σε 1 και μετά σε '1' για να μην
+    # έχει λάθος η σύγκριση νέου δεδομένου
+    entered_values[0] = str(entered_rank_wins_loses[0])
+    entered_values[3] = str(entered_rank_wins_loses[1])
+    entered_values[4] = str(entered_rank_wins_loses[2])
+    
+    # Έλεγχος για στοιχεία που αλλάχθηκαν, πλην θέσης
+    index = 0
+    new_values_flag = False
+    new_rank_flag = False
+    new_values = [
+        None,
+        None,
+        None,
+        None,
+        None
+        ]
+    new_values = [
+        entered_values[0],
+        None,
+        None,
+        None,
+        None
+        ]
+    for entered_value in entered_values:
+        if entered_value != window.values[index]:
+            new_values_flag = True
+            new_values[index] = entered_value
+        index += 1
+    # Ελέγχει αν εισήχθη νέα θέση. Αν δεν εισήχθη νέα θέση, λαμβάνει
+    # την προηγούμενη θέση για αναζήτηση παίκτη.
+    print(new_values)
+    if new_values[0] is None:
+        new_values[0] == entered_values[0]
+        new_rank_flag = False
+    print(new_values[0],'twra einai')
+    print('new vals are', new_values)
+    if new_values_flag:
+        
+        update_info(window, *new_values)
+    
+        msg.showinfo(
+            master = main_window, 
+            parent = window,
+            title = 'Ειδοποίηση',
+            message = 'Τα δεδομένα αποθηκεύτηκαν επιτυχώς.'
+            )
+    window.destroy()
+    fill_tree(tree)
+    return
+    
+    
+def update_info(window, rank, name = None, surname = None, wins = None, loses = None):
+    """
+    Συνάρτηση που ενημερώνει τα δεδομένα χρήστη πλην της θέσης.
+    """
+    print('egw h update_info elava', rank, name, surname, wins, loses)
+    conn = dbconnect('tennis_club.db')
+    cursor = conn.cursor()
+    fields = [
+        ('Name', name), 
+        ('Surname', surname), 
+        ('Wins', wins), 
+        ('Loses', loses)
+        ]
+    for field_name, field_value in fields:
+        if field_value is not None:
+            print('wp! na ta mas! Thes na allaksw to ', field_name,'και ν α το κανω ', field_value)
+            sql_query = "UPDATE ranking SET {0} = ? WHERE Position = ?;".format(field_name)
+            cursor.execute(
+                sql_query,
+                (field_value, rank)
+                )
+    conn.commit()
+    conn.close()
+    return
+    
+    
     
 def on_exit_click():
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για έξοδο.
-    
     Τερματίζει τη λειτουργία της εφαρμογής και κλείνει το κύριο παράθυρο.
     """
     main_window.destroy()
