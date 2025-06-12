@@ -5,125 +5,8 @@ from sqlite3 import Error
 import datetime
 import random
 
-today = datetime.date.today()
-today_string = "{0}/{1}/{2}".format(today.day,today.month,today.year)
 
-
-def challenge(window, player_1, player_2):
-    """
-    Συνάρτηση που ελέγχει την πρόκληση και κάνει τις απαραίτητες αλλαγές 
-    ή ενημερώνει τον χρήστη για το λάθος.
-    
-    
-    Args:
-        window (Top Level): Παράθυρο διαλόγου πρόκλησης.
-        player_1 (int): Θέση του παίκτη που θέτει την πρόκληση.
-        player_2 (int): Θέση του παίκτη που δέχεται την πρόκληση.
-        
-    Returns:
-        None.
-    """
-        
-    # Υπολογισμός της διαφοράς των θέσεων που μπορεί να γίνει μια πρόκληση. 
-    # Συγκεκριμένα για τις θέσεις 1 - 9 η διαφορά μπορεί να είναι μέχρι 3 θέσεις,
-    # ενώ για τις θέσεις από 9 και πάνω, μέχρι 4 θέσεις.
-    allowed_challenge_distance = 4 if player_1 > 9 else 3
-    # Έλεγχος πως επιτρέπεται η διαφορά θέσεων
-    if player_1 - player_2 > allowed_challenge_distance:
-        
-        msg.showerror(
-            master=main_window, 
-            parent=window, 
-            title='Ειδοποίηση', 
-            message=f'''Ο παίκτης που προκαλείται βρίσκεται πάνω από {allowed_challenge_distance} θέσεις πάνω από τον παίκτη που προκαλεί.
-Η πρόκληση είναι άκυρη.''')
-        return
-    
-    # Έλεγχος πως ο παίκτης που προκαλεί είναι κάτω από τον παίκτη που προκαλείται
-    elif player_1 < player_2:
-        msg.showerror(
-            master=main_window,
-            parent=window, 
-            title='Ειδοποίηση', 
-            message="Ο παίκτης που προκαλείται είναι κάτω από τον παίκτη που προκαλεί. \nΗ πρόκληση είναι άκυρη.")
-        return
-    
-    # Έλεγχος για περίπτωση εισαγωγής ίδιου παίκτη
-    elif player_1 == player_2:
-        msg.showerror(
-            master=main_window, 
-            parent=window, 
-            title='Ειδοποίηση', 
-            message='Λάθος καταχώρηση, ο παίκτης που προκαλεί είναι ο παίκτης που δέχεται την πρόκληση.')
-        return
-    
-    # Ενημέρωση αποδοχής πρόκλησης και ερώτηση έκβασης αγώνα
-    answer = msg.askyesnocancel(
-        master=main_window, 
-        parent=window, 
-        title='Αποτέλεσμα Αγώνα',
-        message=f'''Η πρόκληση είναι αποδεκτή.
-Νίκησε ο παίκτης στη θέση #{player_1} που έκανε την πρόκληση;'''
-        )
-    
-    if answer == True:
-        win(window, player_1, player_2)
-        return
-    if answer == False:
-        win(window, player_2, player_1)
-        return
-    # Αν ο χρήστης κλείσει το παράθυρο χωρίς να απαντήσει για νικητή
-    if answer == None:
-        msg.showerror(
-            master=main_window,
-            parent=window, 
-            title='Ειδοποίηση', 
-            message="Ο αγώνας δεν καταγράφηκε, ακύρωση από τον χρήστη."
-            )
-        return
-
-      
-def dbconnect(db_file):
-    """
-    Βοηθητική συνάρτηση που συνδέεται με/δημιουργεί ΒΔ.
-    
-    
-    Args:
-        db_file (str): Όνομα του αρχείου ΒΔ.
-        
-    Returns:
-        sqlite3.Connection: Αντικείμενο σύνδεσης στη βάση δεδομένων ή None σε 
-        περίπτωση αποτυχίας.
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
-    return conn
-
-
-def create_table():
-    """
-    Συνάρτηση που δημιουργεί πίνακα με Position, Name, Surname, Wins, Loses, 
-    Control_Date, όπου Control_Date τελευταία μέρα που έπαιξε αγώνα, ημέρα 
-    ένταξης στο club ή τελευταία φορά που υπέστη decay. 
-    Position = Primary key
-    """
-    my_conn = dbconnect('tennis_club.db') # Δημιουργεί ΔΒ αν δεν υπάρχει
-    
-    sql_query = "CREATE TABLE IF NOT EXISTS ranking (Position INTEGER PRIMARY KEY, Name VARCHAR(128),"\
-                " Surname VARCHAR(128), Wins INTEGER, Loses INTEGER, Control_Date TEXT);" 
-    c = my_conn.cursor()
-
-    c.execute(sql_query) # Δημιουργία Πίνακα με τη Θέση ως Primary Key
-    
-    my_conn.commit()
-    my_conn.close()
-
-
-def initialization(initialization_players,today_string=today_string):
+def initialization(initialization_players):
     """
     Συνάρτηση αρχικοποίησης κατάταξης. Δέχεται λίστα με όνομα και επίθετο 
     χωρισμένα με κενό και την εκχωρεί στον πίνακα της ΒΔ με ανακατεμένη σειρά.
@@ -131,12 +14,12 @@ def initialization(initialization_players,today_string=today_string):
     
     Args:
         initialization_players (list): Λίστα με στοιχεία str όνομα και επίθετο.
-        today_string (str): Σημερινή ημερομηνία σε μορφή "{ημέρα}/{μήνας}/{έτος}".
         
     Returns:
         None.
     """
     
+    today_string = grab_date()
     # Τυχαιοποίηση σειράς παικτών
     random.shuffle(initialization_players)
     my_conn = dbconnect('tennis_club.db')
@@ -158,16 +41,208 @@ def initialization(initialization_players,today_string=today_string):
    
     my_conn.commit()
     my_conn.close()
-    msg.showinfo(
-        master=main_window, 
-        title='Ειδοποίηση', 
-        message='Οι παίκτες καταχωρήθηκαν τυχαία στην κατάταξη.'
-        )
+    return
+
+
+def insert_player_at_end(name, surname, wins=0, loses=0, control_date=None):
+    """
+    Εισαγωγή παίκτη στο τέλος της κατάταξης, προεπιλεγμένες τιμές για Wins & 
+    Loses = 0. Control_Date σήμερα ως ημέρα ένταξης. Εκχωρεί τα δεδομένα στη ΒΔ.
+    
+    
+    Args:
+        name (str): Όνομα παίκτη.
+        surname (str): Επίθετο παίκτη.
+        wins (int): Νίκες παίκτη. Προεπιλεγμένη τιμή 0.
+        loses (int): Ήττες παίκτη. Προεπιλεγμένη τιμή 0.
+        control_date (str): Ημερομηνία τελευταίας δραστηριότητας.
+        Αν δεν λάβει τιμή στην κλήση, τίθεται στη σημερινή ημερομηνία.
+    
+    Returns:
+        int: Τελευταία θέση της κατάταξης.
+    """
+    if control_date is None:
+        control_date = grab_date()
+    
+    my_conn = dbconnect('tennis_club.db')
+    c = my_conn.cursor()
+
+    # Αν η πρώτη θέση είναι κενή δε χρειάζεται να ληφθεί το δεδομένο της 
+    # τελευταίας θέσης, παίρνει τιμή 1. Καταχώρηση νέας τελευταίας θέσης
+    new_last_place = 1 if is_position_empty(1) else c.execute("SELECT Position FROM ranking;").fetchall()[-1][0] + 1
+    
+    new_player = (
+        new_last_place, 
+        name, 
+        surname, 
+        wins, 
+        loses, 
+        control_date
+        ) #Πλειάδα στοιχείων παίκτη
+    c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?);",new_player) #Εκχώρηση παίκτη σε αυτή τη θέση
+    
+    my_conn.commit()
+    my_conn.close()
+    return new_last_place
+
+
+def insert_player_at_position(rank, name='', surname='', wins=0, loses=0, control_date=None):
+    """
+    Εισαγωγή παίκτη σε επιλεγμένη θέση στην κατάταξη της ΒΔ, προεπιλεγμένες τιμές 
+    για Wins & Loses = 0, προεπιλεγμένη τιμή για ημέρα δραστηριότητας η σημερινή ως
+    ημέρα ένταξης στην κατάταξη. Ο παίκτης που κατείχε τη θέση αυτή και όλοι οι
+    παίκτες κάτω του μετακινούνται κατά μία θέση κάτω.
+    
+    
+    Args:
+        Rank (int): Θέση κατάταξης που θα μπει ο παίκτης που εισάγεται.
+        Name (str): Όνομα παίκτη.
+        Surname (str): Επίθετο παίκτη.
+        Wins (int): Νίκες παίκτη. Προεπιλεγμένη τιμή 0.
+        Loses (int): Ήττες παίκτη. Προεπιλεγμένη τιμή 0.
+        Control_Date (str): Ημερομηνία τελευταίας δραστηριότητας.
+        Αν δεν λάβει τιμή στην κλήση, τίθεται στη σημερινή ημερομηνία.
+        
+    Returns:
+        boolean: False αν δεν τοποθετήθηκε ο παίκτης.
+    """
+    
+    if control_date is None:
+        control_date = grab_date()
+        
+    # Αν προσπαθεί να βάλει τον παίκτη σε θέση πάνω από την οποία δεν υπάρχει 
+    # άλλος παίκτης
+    if is_position_empty(rank-1) and rank != 1: 
+        return False
+
+    else:
+        # Αν η λίστα έχει παίκτες πρέπει να μετακινηθούν όλοι μία θέση κάτω
+        if not is_position_empty(1): 
+            my_conn = dbconnect('tennis_club.db')
+            c = my_conn.cursor()
+
+            # Λήψη τρέχουσας τελευταίας θέσης κατάταξης
+            last_place = c.execute("SELECT Position FROM ranking ORDER BY Position DESC LIMIT 1;").fetchone()[0]
+            my_conn.close()
+            # Δημιουργείται κενό βάσει της τελευταίας θέσης και της θέσης που 
+            # θα εισαχθεί ο παίκτης
+            update_positions(rank, last_place) 
+        
+        # Αν η λίστα δεν περιέχει παίκτες και πέρασε τον προηγούμενο έλεγχο, 
+        # ο χρήστης ζήτησε να εισάγει στη θέση 1 τον παίκτη και δε χρειάζεται
+        # κενό η κατάταξη
+        my_conn = dbconnect('tennis_club.db')
+        c = my_conn.cursor()
+
+        new_player = (rank, name, surname, wins, loses, control_date)
+        
+        # Εισαγωγή στην κατάταξη είτε η λίστα έχει παίκτες, 
+        # είτε δεν έχει και ο χρήστης διάλεξε θέση 1
+        c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?);", new_player) 
+        
+
+        my_conn.commit()
+        my_conn.close()
+        return True
+
+
+def change_position(old_position, new_position):
+    """
+    Συνάρτηση που αλλάζει τη θέση παίκτη κάνοντας τις απαραίτητες αλλαγές.
+    Διατηρεί προσωρινά τα δεδομένα ΒΔ του παίκτη, τον διαγράφει από τη ΒΔ,
+    προσπαθεί να τον εισάγει στη νέα θέση. Σε περίπτωση αποτυχίας τον επανεισάγει
+    στην προηγούμενή του θέση.
+    
+    
+    Args:
+        old_position (str): Τρέχουσα θέση παίκτη.
+        new_position (str): Νέα θέση παίκτη.
+        
+    Returns:
+        boolean: True αν η αλλαγή θέσης ήταν επιτυχής.
+    """
+    my_conn = dbconnect('tennis_club.db')
+    cursor = my_conn.cursor()
+    query = cursor.execute("SELECT * FROM ranking WHERE Position = ?;", (old_position,))
+    # Προσωρινή αποθήκευση των δεδομένων του παίκτη
+    player_DB_data = query.fetchall()
+    my_conn.close()
+    entry = list(player_DB_data[0])
+    # Η νέα θέση που θα λάβει
+    entry[0] = int(new_position)
+    # Διαγραφή της προηγούμενης καταχώρησης
+    delete_player(old_position)
+    # Αν απέτυχε η τοποθέτηση του παίκτη επειδή η θέση ήταν εκτός ορίου κατάταξης
+    # επανεισάγεται στη θέση που ήταν.
+    if not insert_player_at_position(*entry):
+        entry[0] = int(old_position)
+        insert_player_at_position( *entry)
+        return False
+    else:
+        return True
+
+
+def update_info(rank, name = None, surname = None, wins = None, loses = None, control_date = None):
+    """
+    Συνάρτηση που ενημερώνει τα δεδομένα χρήστη πλην της θέσης.
+    Τα μόνα πεδία που ανανεώνονται είναι όσα λαμβάνουν μη None value.
+    Τα υπόλοιπα διατηρούν την τιμή που είχαν πριν την κλήση της συνάρτησης.
+    
+    Args:
+        rank (int): Θέση που έχει ο παίκτης του οποίου τα στοιχεία θα ανανεωθούν.
+        name (str): Default None, νέο όνομα παίκτη.
+        surname (str): Default None, νέο επώνυμο παίκτη.
+        wins (int): Default None, νέος αριθμός νικών παίκτη.
+        loses (int): Default None, νέος αριθμός ηττών παίκτη.
+        control_date (str): Default None, νέα ημερομηνία τελευταίας δραστηριότητας.
+    """
+    conn = dbconnect('tennis_club.db')
+    cursor = conn.cursor()
+    fields = [
+        ('Name', name), 
+        ('Surname', surname), 
+        ('Wins', wins), 
+        ('Loses', loses),
+        ('Control_Date', control_date)
+        ]
+    for field_name, field_value in fields:
+        if field_value is not None:
+            sql_query = "UPDATE ranking SET {0} = ? WHERE Position = ?;".format(field_name)
+            cursor.execute(
+                sql_query,
+                (field_value, rank)
+                )
+    conn.commit()
+    conn.close()
+    return
+
+
+def delete_player(index):
+    """
+    Διαγράφει τον παίκτη στη θέση που δίνεται από το index και μετακινεί τους 
+    κατώτερους παίκτες μία θέση πάνω, καλύπτοντας το κενό που δημιουργείται 
+    στη ΒΔ. 
+    
+    
+    Args:
+        index (int): Θέση κατάταξης του προς διαγραφή παίκτη.
+        
+    Returns:
+        None.
+    """
+
+    my_conn = dbconnect('tennis_club.db')
+    c = my_conn.cursor()
+    c.execute("DELETE FROM ranking WHERE Position=?;", (index,)) #Διαγραφή παίκτη
+    c.execute("UPDATE ranking SET Position = Position - 1 WHERE Position > ?;", (index,)) #Ανανέωση λίστας
+    my_conn.commit()
+    my_conn.close()
+    return
 
 
 def fill_tree(tree):
     """
-    Ενημερώνει το tree του UI εκχωρώντας σε αυτό τα στοιχεία όλων των παικτών.
+    Ενημερώνει το Treeview του UI εκχωρώντας σε αυτό τα στοιχεία όλων των παικτών.
     
     
     Args:
@@ -200,168 +275,123 @@ def fill_tree(tree):
     
     my_conn.close()
     return
-    
 
-def insert_player_at_end(window, name, surname, wins=0, loses=0, control_date=today_string):
+      
+def dbconnect(db_file):
     """
-    Εισαγωγή παίκτη στο τέλος της κατάταξης, προεπιλεγμένες τιμές για Wins & 
-    Loses = 0. Control_Date σήμερα ως ημέρα ένταξης. Εκχωρεί τα δεδομένα στη ΒΔ.
+    Βοηθητική συνάρτηση που συνδέεται με/δημιουργεί ΒΔ.
     
     
     Args:
-        window (Top Level Object): Παράθυρο στο οποίο προβάλλονται τυχών μηνύματα
-        name (str): Όνομα παίκτη.
-        surname (str): Επίθετο παίκτη.
-        wins (int): Νίκες παίκτη. Προεπιλεγμένη τιμή 0.
-        loses (int): Ήττες παίκτη. Προεπιλεγμένη τιμή 0.
-        control_date (str): Ημερομηνία τελευταίας δραστηριότητας.
-        Προεπιλεγμένη τιμή η σημερινή ημέρα ως ημέρα ένταξης σε μορφή 
-        "{ημέρα}/{μήνας}/{έτος}".
-    
+        db_file (str): Όνομα του αρχείου ΒΔ.
+        
     Returns:
-        None.
+        sqlite3.Connection: Αντικείμενο σύνδεσης στη βάση δεδομένων ή None σε 
+        περίπτωση αποτυχίας.
     """
-    my_conn = dbconnect('tennis_club.db')
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
+    return conn
+
+
+def check_challenge(player_1, player_2):
+    """
+    Συνάρτηση που ελέγχει την πρόκληση και επιστρέφει έγκριση ή μη της
+    πρόκλησης καθώς και ανάλογο μήνυμα αποτυχίας ή επιτυχίας.
+    
+    
+    Args:
+        player_1 (int): Θέση του παίκτη που θέτει την πρόκληση.
+        player_2 (int): Θέση του παίκτη που δέχεται την πρόκληση.
+        
+    Returns:
+        dict:   success (boolean): True αν δεν υπάρχει λάθος.
+                message (str): Μήνυμα για το παράθυρο ειδοποίησης.
+    """
+        
+    # Υπολογισμός της διαφοράς των θέσεων που μπορεί να γίνει μια πρόκληση. 
+    # Συγκεκριμένα για τις θέσεις 1 - 9 η διαφορά μπορεί να είναι μέχρι 3 θέσεις,
+    # ενώ για τις θέσεις από 9 και πάνω, μέχρι 4 θέσεις.
+    allowed_challenge_distance = 4 if player_1 > 9 else 3
+    # Έλεγχος πως επιτρέπεται η διαφορά θέσεων
+    if player_1 - player_2 > allowed_challenge_distance:
+        return {
+            'success': False,
+            'message': 'Ο παίκτης που προκαλείται βρίσκεται πάνω από {0} θέσεις πάνω από τον παίκτη που προκαλεί.\nΗ πρόκληση είναι άκυρη.'.format(allowed_challenge_distance)
+            }
+    
+    # Έλεγχος πως ο παίκτης που προκαλεί είναι κάτω από τον παίκτη που προκαλείται
+    elif player_1 < player_2:
+        return {
+            'success': False,
+            'message': "Ο παίκτης που προκαλείται είναι κάτω από τον παίκτη που προκαλεί. \nΗ πρόκληση είναι άκυρη."
+            }
+    
+    # Έλεγχος για περίπτωση εισαγωγής ίδιου παίκτη
+    elif player_1 == player_2:
+        return {
+            'success': False,
+            'message': 'Λάθος καταχώρηση, ο παίκτης που προκαλεί είναι ο παίκτης που δέχεται την πρόκληση.'
+            }
+    
+    return {
+        'success': True,
+        'message':'Η πρόκληση είναι αποδεκτή.\nΝίκησε ο παίκτης στη θέση #{0} που έκανε την πρόκληση;'.format(player_1)
+        }
+
+
+def create_table():
+    """
+    Συνάρτηση που δημιουργεί πίνακα με Position, Name, Surname, Wins, Loses, 
+    Control_Date, όπου Control_Date τελευταία μέρα που έπαιξε αγώνα, ημέρα 
+    ένταξης στο club ή τελευταία φορά που υπέστη decay. 
+    Position = Primary key
+    """
+    my_conn = dbconnect('tennis_club.db') # Δημιουργεί ΔΒ αν δεν υπάρχει
+    
+    sql_query = "CREATE TABLE IF NOT EXISTS ranking (Position INTEGER PRIMARY KEY, Name VARCHAR(128),"\
+                " Surname VARCHAR(128), Wins INTEGER, Loses INTEGER, Control_Date TEXT);" 
     c = my_conn.cursor()
 
-    # Αν η πρώτη θέση είναι κενή δε χρειάζεται να ληφθεί το δεδομένο της 
-    # τελευταίας θέσης, παίρνει τιμή 1. Καταχώρηση νέας τελευταίας θέσης
-    new_last_place = 1 if is_position_empty(1) else c.execute("SELECT Position FROM ranking;").fetchall()[-1][0] + 1
-    
-    new_player = (
-        new_last_place, 
-        name, 
-        surname, 
-        wins, 
-        loses, 
-        control_date
-        ) #Πλειάδα στοιχείων παίκτη
-    c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?);",new_player) #Εκχώρηση παίκτη σε αυτή τη θέση
-    
-    # Μήνυμα ενημέρωσης επιτυχούς εισαγωγής
-    msg.showinfo(
-        master=main_window,
-        parent=window, 
-        title='Ειδοποίηση', 
-        message=f'Ο {name} {surname} τοποθετήθηκε επιτυχώς στη θέση #{new_last_place}.'
-        )
+    c.execute(sql_query) # Δημιουργία Πίνακα με τη Θέση ως Primary Key
     
     my_conn.commit()
     my_conn.close()
+    return
 
-
-def insert_player_at_position(window, rank, name='', surname='', wins=0, loses=0, control_date=today_string):
-    """
-    Εισαγωγή παίκτη σε επιλεγμένη θέση στην κατάταξη της ΒΔ, προεπιλεγμένες τιμές 
-    για Wins & Loses = 0, προεπιλεγμένη τιμή για ημέρα δραστηριότητας η σημερινή ως
-    ημέρα ένταξης στην κατάταξη. Ο παίκτης που κατείχε τη θέση αυτή και όλοι οι
-    παίκτες κάτω του μετακινούνται κατά μία θέση κάτω.
     
-    
-    Args:
-        Rank (int): Θέση κατάταξης που θα μπει ο παίκτης που εισάγεται.
-        Name (str): Όνομα παίκτη.
-        Surname (str): Επίθετο παίκτη.
-        Wins (int): Νίκες παίκτη. Προεπιλεγμένη τιμή 0.
-        Loses (int): Ήττες παίκτη. Προεπιλεγμένη τιμή 0.
-        Control_Date (str): Ημερομηνία τελευταίας δραστηριότητας. Προεπιλεγμένη
-        τιμή η σημερινή ημέρα ως ημέρα ένταξης σε μορφή "{ημέρα}/{μήνας}/{έτος}".
-        
-    Returns:
-        boolean: False αν δεν τοποθετήθηκε ο παίκτης.
-    """
-    
-    # Αν προσπαθεί να βάλει τον παίκτη σε θέση πάνω από την οποία δεν υπάρχει 
-    # άλλος παίκτης
-    if is_position_empty(rank-1) and rank != 1: 
-        msg.showerror(
-            master=main_window, 
-            parent=window,
-            title='Ειδοποίηση', 
-            message=f"Δεν υπάρχει άλλος παίκτης πριν τη θέση που προσπαθείτε να καταχωρήσετε τον παίκτη {name} {surname}."
-            )
-        return False
-
-    else:
-        # Αν η λίστα έχει παίκτες πρέπει να μετακινηθούν όλοι μία θέση κάτω
-        if not is_position_empty(1): 
-            my_conn = dbconnect('tennis_club.db')
-            c = my_conn.cursor()
-
-            # Λήψη τρέχουσας τελευταίας θέσης κατάταξης
-            last_place = c.execute("SELECT Position FROM ranking ORDER BY Position DESC LIMIT 1;").fetchone()[0]
-            my_conn.close()
-            # Δημιουργείται κενό βάσει της τελευταίας θέσης και της θέσης που 
-            # θα εισαχθεί ο παίκτης
-            update_positions(rank, last_place) 
-        
-        # Αν η λίστα δεν περιέχει παίκτες και πέρασε τον προηγούμενο έλεγχο, 
-        # ο χρήστης ζήτησε να εισάγει στη θέση 1 τον παίκτη και δε χρειάζεται
-        # κενό η κατάταξη
-        my_conn = dbconnect('tennis_club.db')
-        c = my_conn.cursor()
-
-        new_player = (rank, name, surname, wins, loses, today_string)
-        
-        # Εισαγωγή στην κατάταξη είτε η λίστα έχει παίκτες, 
-        # είτε δεν έχει και ο χρήστης διάλεξε θέση 1
-        c.execute("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?);", new_player) 
-        
-
-        my_conn.commit()
-        my_conn.close()
-        return True
-
-
-def delete_player(index):
-    """
-    Διαγράφει τον παίκτη στη θέση που δίνεται από το index και μετακινεί τους 
-    κατώτερους παίκτες μία θέση πάνω, καλύπτοντας το κενό που δημιουργείται 
-    στη ΒΔ. 
-    
-    
-    Args:
-        index (int): Θέση κατάταξης του προς διαγραφή παίκτη.
-        
-    Returns:
-        None.
-    """
-
-    my_conn = dbconnect('tennis_club.db')
-    c = my_conn.cursor()
-    c.execute("DELETE FROM ranking WHERE Position=?;", (index,)) #Διαγραφή παίκτη
-    c.execute("UPDATE ranking SET Position = Position - 1 WHERE Position > ?;", (index,)) #Ανανέωση λίστας
-    my_conn.commit()
-    my_conn.close()
-    
-
-
-def win(window, winner_index, loser_index,today_string=today_string):
+def win(winner_index, loser_index,today_string=None):
     """
     Καταγράφει τη νίκη με παραμέτρους τις θέσεις των παικτών πριν την αλλαγή της 
     κατάταξης και ανανεώνει τις νίκες και ήττες του κάθε παίκτη στη ΒΔ.
     
     Αν νικήσει ο παίκτης χαμηλότερης θέσης (που κάνει την πρόκληση),
     παίρνει τη θέση του νικημένου (παίκτη που δέχθηκε την πρόκληση). Ο ηττημένος
-    και όλοι οι παίκτες μεταξύ των δύο θέσεων θα μετακινηθούν μία θέση κάτω.
+    και όλοι οι παίκτες μεταξύ των δύο θέσεων θα μετακινηθούν μία θέση κάτω και
+    η συνάρτηση επιστρέφει True.
     
     Αν νικήσει ο παίκτης υψηλότερης θέσης (που δέχθηκε την πρόκληση), δεν 
-    προκαλείται αλλαγή στην κατάταξη, μόνο ενημέρωση νικών και ηττών.
-    
-    Ο χρήστης ενημερώνεται με κατάλληλο μήνυμα.
+    προκαλείται αλλαγή στην κατάταξη, μόνο ενημέρωση νικών και ηττών και
+    επιστρέφει False.
     
     
     Args:
-        window (Top Level): Παράθυρο διαλόγου πρόκλησης.
         winner_index (int): Θέση του παίκτη που νίκησε τον αγώνα.
         loser_index (int): Θέση του παίκτη που έχασε τον αγώνα.
-        today_string (str): Ημερομηνία αγώνα. Προεπιλεγμένη
-        τιμή η σημερινή ημέρα σε μορφή "{ημέρα}/{μήνας}/{έτος}".
+        today_string (str): Ημερομηνία αγώνα. 
+        Αν δεν λάβει τιμή στην κλήση, τίθεται στη σημερινή ημερομηνία.
         
     Returns:
-        None.
+        boolean: True αν έγινε αλλαγή θέσης.
     """
     
+    if today_string is None:
+        today_string = grab_date()
+        
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
 
@@ -407,25 +437,16 @@ def win(window, winner_index, loser_index,today_string=today_string):
 
         # Εισαγωγή νικητή στη θέση ηττημένου
         c.execute("INSERT INTO ranking(Position, Name, Surname, Wins, Loses, Control_Date) VALUES (?, ?, ?, ?, ?, ?);", entry_data)
-        # Ενημέρωση χρήστη για αλλαγές στην κατάταξη
-        msg.showinfo(
-            master=main_window,
-            parent=window, 
-            title='Ειδοποίηση', 
-            message='Το παιχνίδι καταγράφηκε επιτυχώς και η κατάταξη ανανεώθηκε!'
-            )
+        my_conn.commit()
+        my_conn.close()
+        return True
+        
     # Η νίκη δεν προκαλεί αλλαγές στις θέσεις, μόνο σε νίκες και ήττες
     else:
-        msg.showinfo(
-            master=main_window,
-            parent=window,
-            title='Ειδοποίηση', 
-            message='Το παιχνίδι καταγράφηκε επιτυχώς, χωρίς αλλαγή στην κατάταξη!'
-            )
-    window.destroy()
-    my_conn.commit()
-    my_conn.close()
-    
+        my_conn.commit()
+        my_conn.close()
+        return False
+
 
 def update_positions(small_num, big_num):
     """
@@ -459,9 +480,10 @@ def update_positions(small_num, big_num):
 
     my_conn.commit()
     my_conn.close()
+    return
 
 
-def rank_decay(index,today_string=today_string):
+def rank_decay(index, today_string=None):
     """
     Ο παίκτης της θέσης index πέφτει μία θέση λόγω αδράνειας και ο επόμενος
     παίκτης ανεβαίνει στη θέση του και η ΒΔ ενημερώνεται.
@@ -469,12 +491,15 @@ def rank_decay(index,today_string=today_string):
     
     Args:
         index (int): Θέση του παίκτη που πέφτει μία θέση.
-        today_string (str): Ημέρα τελευταίας δραστηριότητας. Προεπιλεγμένη μέρα
-        η σημερινή ως ημέρα πτώσης λόγω αδράνειας σε μορφή "{ημέρα}/{μήνας}/{έτος}".
+        today_string (str): Ημέρα τελευταίας δραστηριότητας. 
+        Αν δεν λάβει τιμή στην κλήση, τίθεται στη σημερινή ημερομηνία.
         
     Returns:
         None.
     """
+    if today_string is None:
+        today_string = grab_date()
+    
     my_conn = dbconnect('tennis_club.db')
     c = my_conn.cursor()
 
@@ -504,6 +529,7 @@ def rank_decay(index,today_string=today_string):
 
     my_conn.commit()
     my_conn.close()
+    return
 
 
 def is_position_empty(index):
@@ -530,19 +556,30 @@ def is_position_empty(index):
     return flag
     
 
-def check_ranking_for_decay(today=today):
-    """Ελέγχει αν υπάρχουν παίκτες που υπόκεινται σε decay στην κατάταξη λόγω
+def check_ranking_for_decay(comparison_date=None):
+    """
+    Ελέγχει αν υπάρχουν παίκτες που υπόκεινται σε decay στην κατάταξη λόγω
     αδράνειας. Ως αδράνεια ορίζεται ημέρα τελευταίας δραστηριότητας μεγαλύτερη
     των 30 ημερών.
     
     
     Args:
-        today (datetime object): Προεπιλεγμένη τιμή η σημερινή ημερομηνία 
-        για σύγκριση με το παρόν.
+        comparison_date (datetime object): Προεπιλεγμένη τιμή η σημερινή 
+        ημερομηνία για σύγκριση με το παρόν.
             
     Returns:
-        None.
+        dict:   
+            immune (tuple): Πλειάδα με όνομα και 
+            επώνυμο παίκτη που δεν πέφτει περαιτέρω. None αν δεν υπάρχει.
+                
+            message (str): Μήνυμα ενημέρωσης ύπαρξης παικτών που ήταν 
+            αδρανείς και θέσεων αυτών.
     """
+    
+    if comparison_date is None:
+        comparison_date = datetime.date.today()
+        today_string = grab_date()
+    
     conn = dbconnect('tennis_club.db')
     cursor = conn.cursor()
 
@@ -550,31 +587,42 @@ def check_ranking_for_decay(today=today):
     decay_list = [] 
     cursor.execute("SELECT Position, Control_Date FROM ranking;")
     ranking = cursor.fetchall()
-    
+    # Δημιουργία dictionary για επιστροφή
+    return_dict = {
+        'immune': (None),
+        'message':''
+        }
     for index, date in ranking:
+        
         # Διαχωρίζει το string της ημερομηνίας
         split_date = date.split(sep='/') 
+        
         # Μετατροπή του string σε datetime object για σύγκριση
-        last_play_date = datetime.date(int(split_date[2]),int(split_date[1]),int(split_date[0]))
-        days_since_last_play = (today - last_play_date).days
+        last_play_date = datetime.date(
+            int(split_date[2]),
+            int(split_date[1]),
+            int(split_date[0])
+            )
+        days_since_last_play = (comparison_date - last_play_date).days
+        
         if days_since_last_play > 30:
             # Έλεγχος για την περίπτωση που ο παίκτης είναι τελευταίος και δεν
             # πέφτει περαιτέρω θέση
             if ranking[-1][0] == index: 
-                cursor.execute("SELECT Name, Surname FROM ranking WHERE Position=?;", (index,))
-                last_player = cursor.fetchone()
-                # Μήνυμα ειδοποίησης χρήστη πως ο παίκτης δεν πέφτει περαιτέρω
-                msg.showinfo(
-                    master=main_window, 
-                    title='Ειδοποίηση', 
-                    message="Ο παικτης {0} {1} είναι ήδη στην τελευταία θέση και δεν πέφτει περαιτέρω.".format(
-                        last_player[0], 
-                        last_player[1]
-                        )
+                cursor.execute(
+                    "SELECT Name, Surname FROM ranking WHERE Position=?;", 
+                    (index,)
                     )
-                cursor.execute("UPDATE ranking SET Control_Date=? WHERE Position=?;", (today_string, index))
+                last_player = cursor.fetchone()
+                # Προσθήκη ονοματεπωνύμου παίκτη στο key 'immune' του dictionary
+                return_dict['immune'] = (last_player[0], last_player[1])
+                cursor.execute(
+                    "UPDATE ranking SET Control_Date=? WHERE Position=?;", 
+                    (today_string, index)
+                    )
                 break
-            # Προστίθεται στη λίστα, η αλλαγή δεν γίνεται εδώ γιατί οδηγεί σε logical error του περάσματος for
+            # Προστίθεται στη λίστα, η αλλαγή δεν γίνεται εδώ γιατί
+            # οδηγεί σε logical error του τρέχοντος περάσματος for
             decay_list.append(index) 
     
     conn.commit()
@@ -582,35 +630,66 @@ def check_ranking_for_decay(today=today):
     
     # Έλεγχος αν η λίστα είναι κενή
     if decay_list: 
-        decay_positions = ','.join([str(single_decay_position) for single_decay_position in decay_list])
+        decay_positions = ','.join(
+            [str(single_decay_position) for single_decay_position in decay_list])
         if len(decay_list) == 1:
-            decay_message = ''.join(['Ο παίκτης στην θέση ', decay_positions, ' έπεσε μία θέση λόγω αδράνειας και η κατάταξη ανανεώθηκε.'])
+            decay_message = ''.join(
+                ['Ο παίκτης στην θέση ', 
+                 decay_positions, 
+                 ' έπεσε μία θέση λόγω αδράνειας και η κατάταξη ανανεώθηκε.'
+                 ])
         else:
-            decay_message = ''.join(['Οι παίκτες στις θέσεις ', decay_positions, ' έπεσαν μία θέση λόγω αδράνειας και η κατάταξη ανανεώθηκε.'])
-        msg.showinfo(
-            master=main_window, 
-            title='Ειδοποίηση', 
-            message=decay_message
-            )
+            decay_message = ''.join(
+                ['Οι παίκτες στις θέσεις ', 
+                 decay_positions, 
+                 ' έπεσαν μία θέση λόγω αδράνειας και η κατάταξη ανανεώθηκε.'
+                 ])
+        return_dict['message'] = decay_message
         # Αντίστροφο πέρασμα της λίστας για αποφυγή λαθών από την αλλαγή θέσης
+        # Π.χ. αν πρέπει να πέσουν οι παίκτες των θέσεων 2 και 3, αν πέσει
+        # πρώτα ο 2ος, θα γίνει 3ος και ο 3ος θα πάρει τη θέση του και θα γίνει
+        # 2ος. Έπειτα, πρέπει να πέσει ο 3ος, αλλά πλεόν ο 3ος είναι ο 2ος.
+        # Για αυτό πρώτα 3ος γίνεται 4ος, μετά 2ος γίνεται 3ος.
         for i in decay_list[::-1]: 
             rank_decay(i)            
     
     # Η λίστα αδρανών παικτών είναι κενή
     else:
-        msg.showinfo(
-            master=main_window, 
-            title='Ειδοποίηση', 
-            message="Δεν υπάρχει κανένας παίκτης που να υπόκειται σε μείωση θέσης λόγω αδράνειας."
-            )
+        return_dict['message'] = "Δεν υπάρχει κανένας παίκτης που να υπόκειται σε μείωση θέσης λόγω αδράνειας."
+    return return_dict
 
 
-def on_initialize_click():
+def grab_date():
+    """
+    Συνάρτηση που επιστρέφει τη σημερινή ημερομηνία στη μορφή "ημέρα/μήνας/έτος".
+    
+    
+    Args:
+        None.
+    
+    Returns:
+        str: Σημερινή ημερομηνία στη μορφή "{ημέρα}/{μήνας}/{έτος}".
+    """
+    today = datetime.date.today()
+    today_string = "{0}/{1}/{2}".format(today.day,today.month,today.year)
+    return today_string
+
+
+# TODO: front-end starts here
+# TODO: fix bug allowing occupation of position #0
+def on_initialize_click(main_window):
     """
     Συνάρτηση κουμπιού Αρχικοποίησης Κατάταξης. Ελέγχει αν υπάρχει ήδη κατάταξη
     και ενημερώνει τον χρήστη για αδυναμία αρχικοποίησης αν υπάρχει.
     Δημιουργεί παράθυρο διαλόγου για εισαγωγή ονομάτων παικτών που θα 
     χρησιμοποιηθούν για την τυχαία αρχικοποίηση κατάταξης.
+    
+    
+    Args:
+        main_window (Tk Object): Κύριο παράθυρο της εφαρμογής.
+        
+    Returns:
+        None.
     """ 
     # Έλεγχος για το αν ο πίνακας περιέχει παίκτες        
     if not is_position_empty(1): 
@@ -741,6 +820,11 @@ def on_finalize_initialization_click(window):
     # Ελέγχει αν η λίστα players είναι κενή
     if window.players:
         initialization(window.players)
+        msg.showinfo(
+            parent=window,
+            title='Ειδοποίηση', 
+            message='Οι παίκτες καταχωρήθηκαν τυχαία στην κατάταξη.'
+            )
         window.destroy()
         return
     
@@ -748,18 +832,25 @@ def on_finalize_initialization_click(window):
         window.destroy()
         # Σε περίπτωση που ήταν κενή ενημερώνει τον χρήστη με το κατάλληλο μήνυμα
         msg.showerror(
-            master=main_window, 
+            parent=window, 
             title='Ειδοποίηση', 
             message='Δε δημιουργήθηκε κατάταξη καθώς δεν εισάγατε ονόματα.'
             )
         return
 
 
-def on_add_player():
+def on_add_player(main_window):
     """
     Συνάρτηση κουμπιού προσθήκης παίκτης στο αρχικό παράθυρο. Ρωτάει τον χρήστη
     αν ο παίκτης θα εισαχθεί στο τέλος της κατάταξης ή σε συγκεκριμένη θέση,
     δημιουργεί παράθυρο διαλόγου για εισαγωγή ονοματεπωνύμου παίκτη.
+    
+    
+    Args:
+        main_window (Tk Object): Κύριο παράθυρο της εφαρμογής.
+        
+    Returns:
+        None.
     """
     
    
@@ -789,13 +880,13 @@ def on_add_player():
     name_entry_dialog.position_entry_answer = position_entry_answer
     tk.Label(
         name_entry_dialog, 
-        font=default_font, 
+        font=main_window.default_font, 
         text = "Δώστε όνομα και επίθετο παίκτη που θέλετε να εισάγετε: "
         ).pack(pady=5)
     # Πεδίο εισαγωγής
     name_entry_dialog.name_entry = tk.Entry(
         name_entry_dialog, 
-        font=default_font, 
+        font=main_window.default_font, 
         justify='center'
         )
     name_entry_dialog.name_entry.pack(pady=5)
@@ -808,7 +899,7 @@ def on_add_player():
     tk.Button(
         name_entry_dialog, 
         text='Προσθήκη', 
-        font=default_font, 
+        font=main_window.default_font, 
         command= lambda: on_new_player_name_submit(name_entry_dialog)
         ).pack(pady=5)
     
@@ -839,7 +930,6 @@ def on_new_player_name_submit(window):
     if len(player_name) != 2: 
         # Ενημέρωση χρήστη με κατάλληλο μήνυμα
         msg.showerror(
-            master=main_window, 
             parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ εισάγετε όνομα και επίθετο χωρισμένα με ένα κενό."
@@ -849,11 +939,18 @@ def on_new_player_name_submit(window):
     # Αν ο χρήστης απάντησε πως δε θέλει να βάλει σε συγκεκριμένη θέση
     # τον παίκτη, μπαίνει στην τελευταία θέση
     if window.position_entry_answer == False:
-        insert_player_at_end(window, name, surname)
+        new_last_place = insert_player_at_end(name, surname)
+        # Μήνυμα ενημέρωσης επιτυχούς εισαγωγής
+        msg.showinfo(
+            parent=window, 
+            title='Ειδοποίηση', 
+            message=f'Ο {name} {surname} τοποθετήθηκε επιτυχώς στη θέση #{new_last_place}.'
+            )
         window.destroy()
     # Αν ο χρήστης απάντησε πως θέλει να βάλει σε συγκεκριμένη θέση τον παίκτη
     elif window.position_entry_answer == True:
         # Δημιουργία παραθύρου διαλόγου
+        default_font = 'Times 16'
         position_entry_dialog = tk.Toplevel(window)
         position_entry_dialog.geometry("600x150+625+450")
         position_entry_dialog.title("Προσθήκη Παίκτη σε Θέση")
@@ -922,18 +1019,22 @@ def on_new_player_position_submit(name, surname, window):
     try:
         player_position = int(window.position_entry.get())
         window.position_entry.delete(0,'end')
-        if insert_player_at_position(window, player_position, name, surname):
+        if insert_player_at_position(player_position, name, surname):
             msg.showinfo(
-                master=main_window, 
                 parent=window, 
                 title='Ειδοποίηση', 
                 message=f'Ο παίκτης {name} {surname} τοποθετήθηκε επιτυχώς στη θέση #{player_position}.'
+                )
+        else:
+            msg.showerror(
+                parent=window,
+                title='Ειδοποίηση', 
+                message=f"Δεν υπάρχει άλλος παίκτης πριν τη θέση που προσπαθείτε να καταχωρήσετε τον παίκτη {name} {surname}."
                 )
         window.destroy()
     except ValueError:
         # Ενημέρωση χρήστη για μη αποδεκτή εισαγωγή θέση (όχι ακέραιος)
         msg.showerror(
-            master=main_window, 
             parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης."
@@ -941,12 +1042,19 @@ def on_new_player_position_submit(name, surname, window):
     return
     
 
-def on_del_player():
+def on_del_player(main_window):
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για διαγραφή παίκτη.
     Ελέγχει αν η κατάταξη περιέχει έστω έναν παίκτη και δημιουργεί παράθυρο 
     διαλόγου για εισαγωγή θέσης κατάταξης του παίκτη που θα διαγραφεί ή ενημερώνει
     τον χρήστη με το ανάλογο μήνυμα σφάλματος.
+    
+    
+    Args:
+        main_window (Tk Object): Κύριο παράθυρο της εφαρμογής.
+        
+    Returns:
+        None.
     """
     # Ελέγχει αν η κατάταξη περιέχει έστω έναν παίκτη
     if is_position_empty(1):
@@ -976,7 +1084,7 @@ def on_del_player():
         deletion_dialog.deletion_entry = tk.Entry(
             deletion_dialog,
             justify = 'center', 
-            font=default_font
+            font=main_window.default_font
             )
         deletion_dialog.deletion_entry.pack(pady=5)
         deletion_dialog.deletion_entry.focus_set()
@@ -1021,11 +1129,10 @@ def on_dialog_delete_click(window):
     # Ο έλεγχος αποδεκτής τιμής γίνεται από την delete_player()
     try:
         index = int(window.deletion_entry.get())
-        delete_player(index, window)
+        delete_player(index)
     except ValueError:
         # Ειδοποίηση χρήστη για λάθος εισαγωγή θέσης
         msg.showerror(
-            master=main_window, 
             parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης."
@@ -1035,7 +1142,6 @@ def on_dialog_delete_click(window):
     # Έλεγχος αν η θέση περιέχει άτομο και ενημέρωση με μήνυμα σφάλματος
     if is_position_empty(index):
         msg.showerror(
-            master=main_window, 
             parent=window,
             title='Ειδοποίηση', 
             message="Δεν υπάρχει παίκτης στη θέση που προσπαθείτε να κάνετε διαγραφή."
@@ -1049,7 +1155,6 @@ def on_dialog_delete_click(window):
         my_conn.close()
         # Παράθυρο επιβεβαίωσης διαγραφής
         confirmation = msg.askyesno(
-            master=main_window,
             parent=window,
             title='Διαγραφή Παίκτη', 
             message=f'''ΠΡΟΣΟΧΉ!!!! Η διαγραφή είναι οριστική κι αμετάκλητη!
@@ -1059,7 +1164,6 @@ def on_dialog_delete_click(window):
         # Ακύρωση διαγραφής και ενημέρωση χρήστη
         if confirmation == False:
             msg.showerror(
-                master=main_window, 
                 parent=window, 
                 title='Ειδοποίηση', 
                 message="Η διαγραφή ακυρώθηκε από τον χρήστη."
@@ -1070,7 +1174,6 @@ def on_dialog_delete_click(window):
             delete_player(index)
             # Μήνυμα ειδοποίησης επιτυχούς διαγραφής
             msg.showinfo(
-                master=main_window, 
                 parent=window,
                 title='Ειδοποίηση', 
                 message=f'Ο παίκτης στη θέση #{index} διαγράφηκε επιτυχώς.'
@@ -1080,7 +1183,7 @@ def on_dialog_delete_click(window):
     return
 
 
-def on_challenge_click():
+def on_challenge_click(main_window):
     """
     Συνάρτηση κουμπιού καταγραφής αγώνα του κυρίου παραθύρου. 
     
@@ -1089,6 +1192,13 @@ def on_challenge_click():
     
     Δημιουργεί παράθυρο διαλόγου για καταγραφή της θέσης του παίκτη που θέτει
     την πρόκληση.
+    
+    
+    Args:
+        main_window (Tk Object): Κύριο παράθυρο της εφαρμογής.
+        
+    Returns:
+        None.
     """
     # Έλεγχος αν η κατάταξη περιέχει έναν ή κανέναν παίκτη και δεν ορίζεται αγώνας
     if is_position_empty(1):
@@ -1120,13 +1230,13 @@ def on_challenge_click():
         tk.Label(
             master=challenge_dialog, 
             textvariable= challenge_dialog.challenge_label, 
-            font=default_font
+            font=main_window.default_font
             ).pack(pady = 10)
         # Πεδίο εισαγωγής
         challenge_dialog.challenge_entry = tk.Entry(
             master=challenge_dialog, 
             justify='center', 
-            font=default_font
+            font=main_window.default_font
             )
         challenge_dialog.challenge_entry.pack(pady = 10)
         challenge_dialog.challenge_entry.focus_set()
@@ -1141,7 +1251,7 @@ def on_challenge_click():
         tk.Button(
             master=challenge_dialog, 
             text='OK', 
-            font = default_font, 
+            font = main_window.default_font, 
             command= lambda: on_dialog_challenge_click(challenge_dialog)
             ).pack(pady = 10)
         challenge_dialog.mainloop()
@@ -1157,7 +1267,7 @@ def on_dialog_challenge_click(window):
     παίκτη που δέχεται την πρόκληση.
     
     Όταν πατιέται το κουμπί δεύτερη φορά, αφότου δηλαδή έχει καταχωρηθεί ο 
-    πρώτος παίκτης, ελέγχεται και πάλι η τιμή και καλεί την challenge() που 
+    πρώτος παίκτης, ελέγχεται και πάλι η τιμή και καλεί την check_challenge() που 
     ελέγχει την πρόκληση σύμφωνα με τους κανόνες και ενημερώνει τη ΒΔ ή 
     ενημερώνει τον χρήστη με το κατάλληλο μήνυμα σφάλματος.
     
@@ -1173,22 +1283,20 @@ def on_dialog_challenge_click(window):
         # Ελέγχει πως η θέση που εισήχθη περιέχει παίκτη ή ενημερώνει με
         # το ανάλογο μήνυμα σφάλματος
         if is_position_empty(int(window.challenge_entry.get())):
-            msg.showerror(
-                master=main_window, 
+            msg.showerror( 
                 parent=window, 
                 title='Ειδοποίηση', 
                 message=f"Δεν υπάρχει παίκτης στη θέση #{window.challenge_entry.get()}"
                 )
             return
-        # Προσθήκη εισαχθείσας θέσεις στη λίστα παικτών που εμπλέκονται
+        # Προσθήκη εισαχθείσας θέσης στη λίστα παικτών που εμπλέκονται
         window.players_in_challenge.append(int(window.challenge_entry.get()))
         window.challenge_entry.delete(0,'end')
     except ValueError:
         # Ενημέρωση χρήστη για εισαγωγή μη ακεραίου
         # Ο έλεγχος των τιμών της πρόκλησης γίνεται από το try block και
-        # από την challenge()
+        # από την check_challenge()
         msg.showerror(
-            master=main_window, 
             parent=window, 
             title='Ειδοποίηση', 
             message="Παρακαλώ, εισάγετε ακέραιο αριθμό για τη θέση κατάταξης."
@@ -1197,19 +1305,65 @@ def on_dialog_challenge_click(window):
     # Εάν έχει λάβει μόνο έναν παίκτη, ενημερώνει το δυναμικό Label
     if len(window.players_in_challenge) == 1:
         window.challenge_label.set('Δώστε τη θέση κατάταξης του παίκτη που δέχεται την πρόκληση:')
-    # Εάν έχει λάβει 2 παίκτες, καλεί την challenge()
+    # Εάν έχει λάβει 2 παίκτες, καλεί την check_challenge()
     elif len(window.players_in_challenge) == 2:
-        challenge(
-            window, 
-            window.players_in_challenge[0], 
-            window.players_in_challenge[1]
-            )
+        return_dict = check_challenge(
+                window.players_in_challenge[0], 
+                window.players_in_challenge[1]
+                )
+        if return_dict['success'] == False:
+            msg.showerror(
+                parent=window, 
+                title='Ειδοποίηση', 
+                message=return_dict['message']
+                )
+        else:
+            answer = msg.askyesnocancel(
+                parent=window, 
+                title='Αποτέλεσμα Αγώνα',
+                message=f'''Η πρόκληση είναι αποδεκτή.
+Νίκησε ο παίκτης στη θέση #{window.players_in_challenge[0]} που έκανε την πρόκληση;'''
+         )
+    
+            if answer == True:
+                change_flag = win(
+                    window.players_in_challenge[0], 
+                    window.players_in_challenge[1]
+                    )
+            elif answer == False:
+                change_flag = win(
+                    window.players_in_challenge[1], 
+                    window.players_in_challenge[0]
+                    )
+            # Αν ο χρήστης κλείσει το παράθυρο χωρίς να απαντήσει για νικητή
+            elif answer == None:
+                msg.showerror(
+                    parent=window, 
+                    title='Ειδοποίηση', 
+                    message="Ο αγώνας δεν καταγράφηκε, ακύρωση από τον χρήστη."
+                    )
+                window.destroy()
+                # Return εδώ για να μην εντοπίσει πρόβλημα change_flag undefined
+                return
+            
+            if change_flag:
+                # Ενημέρωση χρήστη για αλλαγές στην κατάταξη
+                msg.showinfo(
+                    parent=window, 
+                    title='Ειδοποίηση', 
+                    message='Το παιχνίδι καταγράφηκε επιτυχώς και η κατάταξη ανανεώθηκε!'
+                    )
+            else:
+                msg.showinfo(
+                    parent=window,
+                    title='Ειδοποίηση', 
+                    message='Το παιχνίδι καταγράφηκε επιτυχώς, χωρίς αλλαγή στην κατάταξη!'
+                    )
         window.destroy()
-        
-    return
+        return
 
 
-def on_inactive_check_click():
+def on_inactive_check_click(main_window):
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για έλεγχο για αδρανείς παίκτες.
     Ελέγχει αν η κατάταξη περιέχει παίκτες και καλεί την 
@@ -1217,6 +1371,13 @@ def on_inactive_check_click():
     
     Η check_ranking_for_decay() θα ενημερώσει τη ΒΔ αναλόγως με το αν υπάρχουν
     αδρανείς παίκτες.
+    
+    
+    Args:
+        main_window (Tk Object): Κύριο παράθυρο της εφαρμογής.
+        
+    Returns:
+        None.
     """
     # Ελέγχει πως η κατάταξη δεν είναι κενή ή ειδοποιεί με το κατάλληλο μήνυμα
     if is_position_empty(1):
@@ -1226,16 +1387,39 @@ def on_inactive_check_click():
             message="Η κατάταξη δεν περιέχει παίκτες!"
             )
     else:
-        check_ranking_for_decay()
+        decay_result = check_ranking_for_decay()
+    # Αν το immune δεν είναι None
+    if decay_result['immune'] is not None:
+        # Μήνυμα ειδοποίησης χρήστη πως ο παίκτης δεν πέφτει περαιτέρω
+        msg.showinfo(
+            master=main_window, 
+            title='Ειδοποίηση', 
+            message="Ο παικτης {0} {1} είναι ήδη στην τελευταία θέση και δεν πέφτει περαιτέρω.".format(
+                decay_result['immune'][0], 
+                decay_result['immune'][1]
+                )
+            )
+    msg.showinfo(
+        master=main_window, 
+        title='Ειδοποίηση', 
+        message=decay_result['message']
+        )
 
 
-def on_show_ranking_click():
+def on_show_ranking_click(main_window):
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για εμφάνιση της κατάταξης.
     
     Ελέγχει αν η κατάταξη περιέχει παίκτες και δημιουργεί ένα παράθυρο με τον
     πίνακα κατάταξης που γεμίζεται από την print_() ή ενημερώνει τον χρήστη
     με μήνυμα σφάλματος περί άδειας κατάταξης.
+    
+    
+    Args:
+        main_window (Tk Object): Κύριο παράθυρο της εφαρμογής.
+        
+    Returns:
+        None.
     """
     # Ελέγχει πως η κατάταξη δεν είναι κενή ή ειδοποιεί με το κατάλληλο μήνυμα
     if is_position_empty(1):
@@ -1325,14 +1509,14 @@ def on_show_ranking_click():
         # Εντοπίζει clicks στο παράθυρο
         tree.bind(
             "<Button-1>", 
-            lambda event: on_tree_click(event, tree)
+            lambda event: on_tree_click(event, tree, main_window)
             )
         ranking_window.focus_set()
         ranking_window.mainloop()
         return
  
     
-def on_tree_click(event, tree):
+def on_tree_click(event, tree, main_window):
     """
     Συνάρτηση που λαμβάνει τα events clicks στο παράθυρο και ελέγχει αν ήταν
     στο κουμπί επεξεργασίας. Αν ήταν όντως, καλεί την on_edit_click().
@@ -1341,6 +1525,7 @@ def on_tree_click(event, tree):
     Args:
         event (Event Object): Αντικείμενο με τα στοιχεία του event.
         tree (Treeview Object): Το Tree του αρχικού παραθύρου.
+        main_window (Tk Object): Κύριο παράθυρο εφαρμογής.
         
     Returns:
         None.
@@ -1349,11 +1534,11 @@ def on_tree_click(event, tree):
     col = tree.identify_column(event.x)
     row = tree.identify_row(event.y)
     if col == "#0" and region == 'tree' and row:
-        on_edit_click(row, tree)
+        on_edit_click(row, tree, main_window)
     return
 
 
-def on_edit_click(item_id, tree):
+def on_edit_click(item_id, tree, main_window):
     """
     Συνάρτηση απόκρισης στο click στην στήλη επεξεργασία. Ανοίγει παράθυρο
     διαλόγου για επεξεργασία των πεδίων.
@@ -1362,6 +1547,7 @@ def on_edit_click(item_id, tree):
     Args:
         item_id (event.y object): Παράμετρος που καθορίζει ποια γραμμή επιλέχθηκε.
         tree (Treeview object): Ο πίνακας του παραθύρου.
+        main_window (Tk object): Κύριο παράθυρο εφαρμογής.
         
     Returns:
         None.
@@ -1388,12 +1574,12 @@ def on_edit_click(item_id, tree):
     for value in edit_details_dialog.values:
         tk.Label(
             edit_details_dialog,
-            font = default_font,
+            font = main_window.default_font,
             text = columns[col_index],
             ).pack(pady=5)
         entry = tk.Entry(
             edit_details_dialog,
-            font = default_font,
+            font = main_window.default_font,
             justify = 'center', 
             )
         entry.insert(0,value)
@@ -1409,7 +1595,7 @@ def on_edit_click(item_id, tree):
 
     tk.Button(
         edit_details_dialog, 
-        font = default_font,
+        font = main_window.default_font,
         text = "Αποθήκευση", 
         command = lambda: on_edit_save(edit_details_dialog,tree)
         ).pack(pady=5)
@@ -1457,7 +1643,6 @@ def on_edit_save(window, tree):
             
         except ValueError:
             msg.showerror(
-                master=main_window, 
                 parent=window, 
                 title='Ειδοποίηση', 
                 message="Παρακαλώ, εισάγετε ακέραιο θετικό αριθμό για {0}".format(tag)
@@ -1467,9 +1652,9 @@ def on_edit_save(window, tree):
             window.entry_fields[index].insert(0, window.values[index])
             return
     
-    # Έλεγχος πως εισάγεται μόνο μια λέξη σε Όνομα και Επώνυμο.
+    # Έλεγχος πως εισάγεται μόνο μια μη κενή λέξη σε Όνομα και Επώνυμο.
     for index in range(1,3):
-        if len(entered_values[index].split(' ')) > 1:
+        if len(entered_values[index].split(' ')) > 1 or entered_values[index] =='':
             if index == 1:
                 tag = 'όνομα'
                 # Αντικαθιστά τα κενά με παύλες
@@ -1483,7 +1668,6 @@ def on_edit_save(window, tree):
                 window.entry_fields[2].insert(0, entered_values[index])
 
             msg.showerror(
-                master = main_window,
                 parent = window,
                 title = 'Ειδοποίηση',
                 message = '''Παρακαλώ εισάγετε μόνο μία λέξη χωρίς κενά για το {0}.
@@ -1496,7 +1680,6 @@ def on_edit_save(window, tree):
         window.entry_fields[-1].delete(0,'end')
         window.entry_fields[-1].insert(0, window.values[-1])
         msg.showerror(
-            master = main_window,
             parent = window,
             title = 'Ειδοποίηση', 
             message = 'Παρακαλώ εισάγετε ημερομηνία στη μορφή 16/6/2025'
@@ -1511,9 +1694,9 @@ def on_edit_save(window, tree):
             int(entered_date[0])
             )
         # Έλεγχος εισαγωγής μελλοντικής ημερομηνίας τελευταίας δραστηριότητας.
+        today = datetime.date.today()
         if entered_datetime_obj > today:
             msg.showerror(
-                master = main_window,
                 parent = window,
                 title = 'Ειδοποίηση', 
                 message = 'Μη αποδεκτή μελλοντική ημερομηνία τελευταίας δραστηριότητας.'
@@ -1521,7 +1704,6 @@ def on_edit_save(window, tree):
             return
     except ValueError:
         msg.showerror(
-            master = main_window,
             parent = window,
             title = 'Ειδοποίηση', 
             message = 'Παρακαλώ ελέγξτε την ημερομηνία και ξαναπροσπαθήστε.'
@@ -1572,7 +1754,6 @@ def on_edit_save(window, tree):
             )
     
         msg.showinfo(
-            master = main_window, 
             parent = window,
             title = 'Ειδοποίηση',
             message = 'Τα δεδομένα αποθηκεύτηκαν επιτυχώς.'
@@ -1580,89 +1761,46 @@ def on_edit_save(window, tree):
         
     # Ανανέωση θέσης
     if new_rank_flag:
-        my_conn = dbconnect('tennis_club.db')
-        cursor = my_conn.cursor()
-        query = cursor.execute("SELECT * FROM ranking WHERE Position = ?;", (window.values[0],))
-        # Προσωρινή αποθήκευση των δεδομένων του παίκτη
-        player_DB_data = query.fetchall()
-        entry = list(player_DB_data[0])
-        # Η νέα θέση που θα λάβει
-        entry[0] = int(new_values[0])
-        # Διαγραφή της προηγούμενης καταχώρησης
-        delete_player(window.values[0])
-        # Αν απέτυχε η τοποθέτηση του παίκτη επειδή η θέση ήταν εκτός ορίου κατάταξης
-        # επανεισάγεται στη θέση που ήταν.
-        if not insert_player_at_position(window, *entry):
-            entry[0] = int(window.values[0])
-            insert_player_at_position(window, *entry)
+        if change_position(window.values[0], new_values[0]):
             msg.showinfo(
-                master=main_window,
-                parent=window,
-                title='Ειδοποίηση', 
-                message='Η αλλαγή θέσης ακυρώθηκε.'
-                )
-        else:
-            msg.showinfo(
-                master=main_window,
                 parent=window,
                 title='Ειδοποίηση',
                 message='Η αλλαγή θέσης καταχωρήθηκε.'
                 )
+        else:
+            name = new_values[1] if new_values[1] is not None else window.values[1]
+            surname = new_values[2] if new_values[2] is not None else window.values[2]
+            msg.showerror(
+                parent=window,
+                title='Ειδοποίηση', 
+                message=f"Δεν υπάρχει άλλος παίκτης πριν τη θέση που προσπαθείτε να καταχωρήσετε τον παίκτη {name} {surname}.\nΗ αλλαγή θέσης ακυρώθηκε."
+                )
+            
     window.destroy()
     # Ανανέωση δεδομένων πίνακα
     fill_tree(tree)
     return
     
     
-def update_info(rank, name = None, surname = None, wins = None, loses = None, control_date = None):
-    """
-    Συνάρτηση που ενημερώνει τα δεδομένα χρήστη πλην της θέσης.
-    Τα μόνα πεδία που ανανεώνονται είναι όσα λαμβάνουν μη None value.
-    Τα υπόλοιπα διατηρούν την τιμή που είχαν πριν την κλήση της συνάρτησης.
-    
-    Args:
-        rank (int): Θέση που έχει ο παίκτης του οποίου τα στοιχεία θα ανανεωθούν.
-        name (str): Default None, νέο όνομα παίκτη.
-        surname (str): Default None, νέο επώνυμο παίκτη.
-        wins (int): Default None, νέος αριθμός νικών παίκτη.
-        loses (int): Default None, νέος αριθμός ηττών παίκτη.
-        control_date (str): Default None, νέα ημερομηνία τελευταίας δραστηριότητας.
-    """
-    conn = dbconnect('tennis_club.db')
-    cursor = conn.cursor()
-    fields = [
-        ('Name', name), 
-        ('Surname', surname), 
-        ('Wins', wins), 
-        ('Loses', loses),
-        ('Control_Date', control_date)
-        ]
-    for field_name, field_value in fields:
-        if field_value is not None:
-            sql_query = "UPDATE ranking SET {0} = ? WHERE Position = ?;".format(field_name)
-            cursor.execute(
-                sql_query,
-                (field_value, rank)
-                )
-    conn.commit()
-    conn.close()
-    return
-    
-    
-    
-def on_exit_click():
+def on_exit_click(main_window):
     """
     Συνάρτηση κουμπιού κυρίου παραθύρου για έξοδο.
     Τερματίζει τη λειτουργία της εφαρμογής και κλείνει το κύριο παράθυρο.
+    
+    
+    Args:
+        main_window (Tk Object): Κύριο παράθυρο της εφαρμογής.
+        
+    Returns:
+        None.
     """
     main_window.destroy()
 
-if __name__ == '__main__':
-    # Δημιουργία κύριου παραθύρου
+def start_app():
     main_window = tk.Tk()
     main_window.geometry('600x600+650+150')
     main_window.title("Tennis Ladder App")
-    default_font = 'Times 16'
+    main_window.default_font = 'Times 16'
     
     ttk.Separator(
         main_window,
@@ -1685,8 +1823,8 @@ if __name__ == '__main__':
         tk.Button(
             main_window,
             text = label,
-            font = default_font,
-            command = function,
+            font = main_window.default_font,
+            command = lambda f=function: f(main_window),
             relief = 'groove', 
             bd = 10
             ).pack(
@@ -1706,3 +1844,6 @@ if __name__ == '__main__':
             )
     create_table()
     main_window.mainloop()
+
+if __name__ == '__main__':
+    start_app()
