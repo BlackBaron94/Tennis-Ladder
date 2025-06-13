@@ -253,11 +253,14 @@
 ---
 
 <div align="center">
-    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Ladder/Tennis-Show-Ranking-Editing-Values.jpg.jpg" alt="Tennis-Show-Ranking-Editing-Values.jpg" width="500"/>
-    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Ladder/Tennis-Show-Ranking-Changed-Values.jpg.jpg" alt="Tennis-Show-Ranking-Changed-Values.jpg" width="500"/>
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Show-Ranking-Editing-Values.jpg" alt="Tennis-Show-Ranking-Editing-Values.jpg" width="850"/>
+</div>
+<div align="center">
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Show-Ranking-Changed-Values.jpg" alt="Tennis-Show-Ranking-Changed-Values.jpg" width="850"/>
 </div>
 
 <p align="center"><b>Τροποποίηση δεδομένων στην εμφάνιση κατάταξης.</b>
+
 ---
 
 > **Υπάρχει αμυντικός προγραμματισμός σε όλες τις εισαγωγές δεδομένων (εισαγωγή παικτών, εισαγωγή θέσεων παικτών, ακύρωση λειτουργιών χωρίς αλλαγές). Ο χρήστης ειδοποιείται με το κατάλληλο μήνυμα και οδηγίες για τη σωστή μορφή δεδομένων. Παρακάτω φαίνονται μερικές από αυτές τις περιπτώσεις.**
