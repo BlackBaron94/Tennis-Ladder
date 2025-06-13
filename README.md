@@ -197,7 +197,7 @@
 </div>
 
 <div align="center">
-    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Randomized-Ranking.jpg" alt="Tennis-Randomized-Ranking" width="500"/>
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Randomized-Ranking.jpg" alt="Tennis-Randomized-Ranking" width="850"/>
 </div>
 
 <p align="center"><b>Παράθυρο διαλόγου αρχικοποίησης και πίνακας κατάταξης.</b></p>
