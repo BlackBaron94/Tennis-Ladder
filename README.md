@@ -182,6 +182,8 @@
     <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Main-Menu.jpg" alt="Tennis-Main-Menu" width="500"/>
 </div>
 
+<p align="center"><b>Το κύριο μενού της εφαρμογής.</b></p>
+
 ---
 
 > **Παρακάτω φαίνεται το παράθυρο διαλόγου αρχικοποίησης κατάταξης και η εμφάνιση του πίνακα κατάταξης. Η τυχαιποιημένη αρχικοποίηση είναι διαθέσιμη μόνο όταν η κατάταξη είναι άδεια. Αυτή η λειτουργία
@@ -198,6 +200,8 @@
     <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Randomized-Ranking.jpg" alt="Tennis-Randomized-Ranking" width="500"/>
 </div>
 
+<p align="center"><b>Παράθυρο διαλόγου αρχικοποίησης και πίνακας κατάταξης.</b></p>
+
 ---
 
 > **Η λειτουργία προσθήκης παίκτη είναι διαθέσιμη με εισαγωγή είτε σε συγκεκριμένη θέση είτε στο τέλος της κατάταξης. Η λειτουργία διαγραφής παίκτη γίνεται βάσει θέσης και υπάρχει επιβεβαίωση διαγραφής. Σε αυτό το παράθυρο διαλόγου παρουσιάζεται το όνομα του εν λόγω παίκτη για αποφυγή λαθών.**
@@ -208,6 +212,8 @@
    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Added-Player.jpg" alt="Tennis-Added-Player" width="500" style="display: inline-block;"/>
    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Delete-Player-Question.jpg" alt="Tennis-Delete-Player-Question" width="500" style="display: inline-block;"/>
 </div>
+
+<p align="center"><b>Παράθυρο διαλόγου προσθήκης παίκτη και διαγραφής παίκτη.</b></p>
 
 ---
 
@@ -225,6 +231,8 @@
    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Result-Registered.jpg" alt="Tennis-Result-Registered" width="500" style="display: inline-block;"/>
 </div>
 
+<p align="center"><b>Παράθυρο διαλόγου ελέγχου και καταγραφής αγώνα.</b></p>
+
 ---
 
 > **Ο έλεγχος για αδρανείς παίκτες αφορά το αν κάποιος παίκτης είναι αδρανής για ένα μήνα. Η ποινή για αδράνεια συνεπάγεται πτώση μιας θέσης στην κατάταξη. Στην παρακάτω περίπτωση οι παίκτες 1, 4, 6, 8 είναι αδρανείς, αλλά ο παίκτης 8 είναι τελευταίος και δεν εφαρμόζεται ποινή.**
@@ -236,6 +244,20 @@
    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Decay-YES.jpg" alt="Tennis-Decay-YES" width="500" style="display: inline-block;"/>
 </div>
 
+<p align="center"><b>Έλεγχος κατάταξης για αδρανείς παίκτες.</b></p>
+
+---
+
+>**Πατώντας εμφάνιση κατάταξης, ο χρήστης μπορεί να δει την κατάταξη και πατώντας στο μολυβάκι της στήλης "Επεξεργασία", μπορεί να αλλάξει όλα τα δεδομένα που διατηρούνται για τον συγκεκριμένο παίκτη. Υπάρχει έλεγχος για την σωστή εισαγωγή δεδομένων και σύσταση για διόρθωση, παραδείγματος χάριν αν ο χρήστης βάλει παραπάνω από μία λέξη στο όνομα ή το επώνυμο, τα κενά αντικαθίστανται με παύλες (για να δώσουν λύση στην περίπτωση διπλού ονόματος).**
+
+---
+
+<div align="center">
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Ladder/Tennis-Show-Ranking-Editing-Values.jpg.jpg" alt="Tennis-Show-Ranking-Editing-Values.jpg" width="500"/>
+    <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/Tennis-Ladder/Tennis-Show-Ranking-Changed-Values.jpg.jpg" alt="Tennis-Show-Ranking-Changed-Values.jpg" width="500"/>
+</div>
+
+<p align="center"><b>Τροποποίηση δεδομένων στην εμφάνιση κατάταξης.</b>
 ---
 
 > **Υπάρχει αμυντικός προγραμματισμός σε όλες τις εισαγωγές δεδομένων (εισαγωγή παικτών, εισαγωγή θέσεων παικτών, ακύρωση λειτουργιών χωρίς αλλαγές). Ο χρήστης ειδοποιείται με το κατάλληλο μήνυμα και οδηγίες για τη σωστή μορφή δεδομένων. Παρακάτω φαίνονται μερικές από αυτές τις περιπτώσεις.**
@@ -251,6 +273,8 @@
   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Challenge-Canceled.jpg" alt="Tennis-Challenge-Canceled" width="500" style="display: inline-block;"/>
   <img src="https://raw.githubusercontent.com/BlackBaron94/images/main/TennisLadderImages/Tennis-Deletion-Cancelled.jpg" alt="Tennis-Deletion-Cancelled" width="500" style="display: inline-block;"/>
 </div>
+
+<p align="center"><b>Παραδείγματα αμυντικού προγραμματισμού.</b></p>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
