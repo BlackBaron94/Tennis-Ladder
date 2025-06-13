@@ -66,7 +66,9 @@ def start_app():
         ).pack(
             side = 'right'
             )
+            
     create_table()
+    main_window.focus_set()
     main_window.mainloop()
     return
 
@@ -342,7 +344,7 @@ def on_new_player_name_submit(window):
         msg.showinfo(
             parent=window, 
             title='Ειδοποίηση', 
-            message=f'Ο {name} {surname} τοποθετήθηκε επιτυχώς στη θέση #{new_last_place}.'
+            message=f'Ο {name} {surname} τοποθετήθηκε επιτυχώς στην θέση #{new_last_place}.'
             )
         window.destroy()
     # Αν ο χρήστης απάντησε πως θέλει να βάλει σε συγκεκριμένη θέση τον παίκτη
