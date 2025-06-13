@@ -168,7 +168,7 @@
 
 ## Χρήση
 
-Υπάρχει διαθέσιμο video demo [εδώ](https://drive.google.com/file/d/1DFihKx1Vyke6czRwdj_89D8w2RjAyyhL/view?usp=drive_link).
+Υπάρχει διαθέσιμο video demo [εδώ](https://drive.google.com/file/d/1MkW2A-iyxVoFGQkGixezvF2cfNggmixp/view?usp=drive_link).
 
 Εναλλακτικά, παρακάτω φαίνονται παραδείγματα χρήσης με εικόνες.
 
