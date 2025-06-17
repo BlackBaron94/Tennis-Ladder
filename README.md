@@ -28,6 +28,7 @@
 * [![tkinter][tkinter.python]][tkinter-url]
 * [![SQLite3][sqlite3.python]][sqlite3-url]  
 * [![datetime][datetime.python]][datetime-url]
+* [<img src="https://avatars.githubusercontent.com/u/1215332?v=4" alt="PyInstaller_Logo" width="40" />][PyInstaller-url] PyInstaller
 
 
 ### Αρχεία του Project
@@ -309,3 +310,4 @@ Project Link: [Tennis Ladder](https://github.com/BlackBaron94/Tennis-Ladder-UI-U
 [sqlite3-url]: https://docs.python.org/3/library/sqlite3.html
 [datetime.python]: https://img.shields.io/badge/datetime-5.3-66ccff?style=flat&labelColor=3670A0&logo=python&logoColor=ffdd54
 [datetime-url]: https://docs.python.org/3/library/datetime.html
+[PyInstaller-url]: https://pyinstaller.org/
