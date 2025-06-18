@@ -23,13 +23,17 @@
 διαγραφή παίκτη και επεξεργασία στοιχείων παίκτη (CRUD), τυχαιοποιημένη αρχική εισαγωγή παικτών, έλεγχο και καταγραφή πρόκλησης και 
 αποτελεσμάτων αγώνων. Επιπλέον, υπάρχει η λειτουργία ελέγχου αδράνειας που ενημερώνει αυτοματοποιημένα τις θέσεις κατάταξης.
 
-### Τεχνολογίες και βιβλιοθήκες που χρησιμοποιήθηκαν
+### Τεχνολογίες και βιβλιοθήκες που χρησιμοποιήθηκαν:
 
-* [![Python][python.org]][Python-url]
-* [![tkinter][tkinter.python]][tkinter-url]
-* [![SQLite3][sqlite3.python]][sqlite3-url]  
-* [![datetime][datetime.python]][datetime-url]
-* [<img src="https://avatars.githubusercontent.com/u/1215332?v=4" alt="PyInstaller_Logo" width="40" />][PyInstaller-url] PyInstaller
+<a href="https://python.org/"> <img src="https://img.shields.io/badge/Python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54&style=plastic" alt="Python-logo" width=100px/></a>
+
+<a href="https://docs.python.org/3/library/tkinter.html"> <img src="https://img.shields.io/badge/Frontend-tkinter-blue?style=plastic" alt="tkinter-logo" width=140px/></a>
+
+<a href="https://docs.python.org/3/library/sqlite3.html"> <img src="https://img.shields.io/badge/SQLite3-003B57?logo=sqlite&logoColor=white&style=plastic" alt="SQLite-Logo" width=100px/></a>
+
+<a href="https://docs.python.org/3/library/datetime.html"> <img src="https://img.shields.io/badge/DateTime-5.3-66ccff?style=flat&labelColor=3670A0&logo=python&logoColor=ffdd54" alt="DateTime-Logo" width=140px height=28px/></a>
+  
+<a href="https://pyinstaller.org/"><img src="https://raw.githubusercontent.com/BlackBaron94/images/main/PyInstaller-Logo.png" alt="PyInstaller-Logo" width=37px/><img src="https://img.shields.io/badge/PyInstaller-23364D" alt="PyInstaller-Logo-Text" width=100px/></a>
 
 
 ### Αρχεία του Project
@@ -299,7 +303,7 @@
 
 Γιώργος Τσολακίδης - [Linked In: Giorgos Tsolakidis](https://www.linkedin.com/in/black-baron/) - black_baron94@hotmail.com 
 
-Project Link: [Tennis Ladder](https://github.com/BlackBaron94/Tennis-Ladder-UI-Upgrade)
+Project Link: [Tennis Ladder](https://github.com/BlackBaron94/Tennis-Ladder)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -310,12 +314,3 @@ This project is licensed under the MIT License – see the [LICENSE](./LICENSE) 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-[python.org]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
-[python-url]: https://python.org/
-[tkinter.python]: https://img.shields.io/badge/Frontend-tkinter-blue
-[tkinter-url]: https://docs.python.org/3/library/tkinter.html
-[sqlite3.python]: https://img.shields.io/badge/SQLite-blue?logo=sqlite&logoColor=white
-[sqlite3-url]: https://docs.python.org/3/library/sqlite3.html
-[datetime.python]: https://img.shields.io/badge/datetime-5.3-66ccff?style=flat&labelColor=3670A0&logo=python&logoColor=ffdd54
-[datetime-url]: https://docs.python.org/3/library/datetime.html
-[PyInstaller-url]: https://pyinstaller.org/
