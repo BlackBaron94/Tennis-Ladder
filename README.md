@@ -306,7 +306,7 @@ Project Link: [Tennis Ladder](https://github.com/BlackBaron94/Tennis-Ladder-UI-U
 ## License
 
 
-This project is licensed under the MIT License – see the [LICENSE](./LICENSE) file for details.
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
